@@ -1,0 +1,58 @@
+# KimoiTV (English). Ported from yuzono/anime-extensions, src/en/kimoitv (Apache-2.0).
+# PARKED, do not install: no playback (Cloudflare Turnstile gates the video request and search) and the [episodes] block
+# below lists seasons, not episodes. See README.md. Popular, latest and details do work.
+id = "kimoitv"
+name = "KimoiTV"
+lang = "en"
+kind = "anime"
+base_urls = ["https://kimoitv.com"]
+rate_limit_ms = 1000
+
+# The Kotlin sends a Referer with the video file.
+[headers]
+Referer = "https://kimoitv.com/"
+
+[urls]
+popular = "/list/Anime.html?sort=top&page={page}"
+latest = "/list/Anime.html?sort=newest&page={page}"
+# No `search`: /search/ redirects to a Cloudflare Turnstile verify page (see README.md).
+
+[popular]
+items = "div.movie-grid > div.content-card"
+title = { select = "div.content-title" }
+url = { select = "a", attr = "href" }
+cover = { select = "img.content-poster", attr = "src" }
+next_page = "ul.pagination li.page-item:has(a.bg-dark) ~ li.page-item > a"
+
+[latest]
+items = "div.movie-grid > div.content-card"
+title = { select = "div.content-title" }
+url = { select = "a", attr = "href" }
+cover = { select = "img.content-poster", attr = "src" }
+next_page = "ul.pagination li.page-item:has(a.bg-dark) ~ li.page-item > a"
+
+[details]
+cover = { select = "div#pilled img.img-fluid", attr = "src" }
+description = { select = "div#description > p", all = true, join = "\n\n" }
+genre = { select = "div.chip span.chip-label", all = true }
+
+# STOPGAP. On this site the title page only links to its season pages (/title/<id>/<name>/Season-01.html, one per
+# audio version); the episode links are on those pages. A recipe reads one page, so the list here is the seasons, not
+# the episodes, and nothing under it plays.
+[episodes]
+items = "div#seasonsAccordion a.list-group-item"
+name = { attr = "href", regex = "/([^/]+)\\.html$" }
+url = { attr = "href" }
+number = { attr = "href", regex = "Season-(\\d+)" }
+
+# The Kotlin POSTs the id of the episode page to /streamvpaid.php and reads <source src> from the answer. A recipe has
+# no POST, and the site now answers "Invalid Ticket" without a Turnstile token. This block finds nothing.
+[videos]
+items = "video source"
+url = { attr = "src" }
+
+[tests]
+popular = "popular.html"
+latest = "latest.html"
+details = "title.html"
+episodes = "title.html"

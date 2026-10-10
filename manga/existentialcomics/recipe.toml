@@ -1,0 +1,44 @@
+# Existential Comics, ported from keiyoushi/extensions-source (src/en/existentialcomics), Apache-2.0. See README.md.
+id = "existentialcomics"
+name = "Existential Comics"
+lang = "en"
+kind = "manga"
+base_urls = ["https://existentialcomics.com"]
+rate_limit_ms = 1000
+
+[urls]
+# The site is one comic, so Browse shows one entry. The extension had it built in; a recipe reads it from a page instead.
+# The category archive is the page that links to the by-date archive (the by-date page does not link to itself).
+popular = "/archive"
+
+[popular]
+items = "html"
+title = { select = "title", regex = " - (.+)$" }
+url = { select = "a[href='/archive/byDate']", attr = "href" }
+# The site logo (protocol-relative src), the same element on every page. The extension used a hosted picture instead.
+cover = { select = "#content > a > img", attr = "src" }
+
+[details]
+title = { select = "title", regex = " - (.+)$" }
+description = { select = "#content > a > img", attr = "alt" }
+cover = { select = "#content > a > img", attr = "src" }
+
+# The by-date archive lists the comics oldest first, one li each; the first link of the li is the comic (the second,
+# when there is one, is the Spanish version). Same as Jsoup "a:eq(0)".
+[chapters]
+items = "div#date-comics ul li"
+name = { select = "a", nth = 0 }
+url = { select = "a", nth = 0, attr = "href" }
+number = { select = "a", nth = 0, attr = "href", regex = "/comic/(\\d+)$" }
+reverse = true
+
+[pages]
+items = "img.comicImg"
+image = { attr = "src" }
+
+[tests]
+item_url = "^/comic/\\d+$"
+popular = "archive-category.html"
+details = "archive-bydate.html"
+chapters = "archive-bydate.html"
+pages = "comic.html"

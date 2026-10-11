@@ -6,19 +6,18 @@ Each source is a small text recipe (`recipe.toml`) plus saved page samples (`fix
 Sources are ported from open-source Aniyomi and Mihon extension repositories (Apache-2.0). Each source's README names the
 original and what was changed.
 
-## How to add a source to the app
+## How to add this repository to the app
 
-Kurobayomi ships with no online sources. Today you add one by copying its recipe into the app's scrapers folder:
+Like Aniyomi, you add a repository by its link; Kurobayomi ships with no online sources.
 
-1. Get this repo: `git clone https://github.com/anas1412/kurobayomi-extensions.git`, or download a single `recipe.toml`
-   from the source's folder on GitHub (open the file, then "Raw").
-2. Create the scrapers folder if it does not exist: `mkdir -p ~/.local/share/kurobayomi/scrapers`
-   (with Flatpak the folder is inside the app's own data folder).
-3. Copy the recipe and give it the source name, for example:
-   `cp manga/existentialcomics/recipe.toml ~/.local/share/kurobayomi/scrapers/existentialcomics.toml`
-4. Restart Kurobayomi. Open **Browse**, then **Sources**: the source is in the list under its language.
+1. In Kurobayomi open **Browse**, then the menu, then **Extension repos**, and add this link:
+   `https://raw.githubusercontent.com/anas1412/kurobayomi-extensions/main/index.min.json`
+2. Open **Browse**, then **Extensions**: the sources of this repository are listed. Install the ones you want.
+3. They appear under **Browse**, then **Sources**.
 
-Installing by pasting this repository's link into the app (Browse, Extensions, repos) is planned and not built yet.
+**Not working yet:** the repository index file and the install step in the app are still being built, so this link does
+not work today. Until then, developers can test a recipe by copying it to `~/.local/share/kurobayomi/scrapers/<name>.toml`
+and restarting the app.
 
 ## Sources
 

@@ -1,0 +1,6 @@
+Kurobayomi extensions
+
+The sources in sources/ and the built files in dist/ are ports of open-source Aniyomi and Mihon extensions (keiyoushi,
+yuzono and others), licensed under the Apache License, Version 2.0. The full text is in LICENSE. Each source's README.md
+names its original and what was changed. Changed files carry this notice of modification: they are rewritten as Kurobayomi
+text recipes or WASM plug-ins.

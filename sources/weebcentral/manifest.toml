@@ -1,0 +1,7 @@
+id = "weebcentral"
+name = "Weeb Central"
+lang = "en"
+kind = "manga"
+version = 1
+# The only hosts the plug-in may reach through the `http` import. Page images load in the app, not here.
+hosts = ["weebcentral.com"]

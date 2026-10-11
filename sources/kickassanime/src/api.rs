@@ -1,9 +1,10 @@
 //! The kaa.lt JSON API as pure functions: URLs, the search request and one parser per response. Ported from
-//! `KickAssAnime.kt` and `dto/KickAssAnimeDto.kt` (Apache-2.0, yuzono). Filters and the English-title setting are not
-//! here: the app sends no filters to anime packages, and the settings are fixed at their Kotlin defaults.
+//! `KickAssAnime.kt`, `KickAssAnimeFilters.kt` and `dto/KickAssAnimeDto.kt` (Apache-2.0, yuzono). The English-title
+//! setting is fixed at its Kotlin default (off).
 
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use url::Url;
 
 pub type Res<T> = Result<T, String>;
@@ -181,9 +182,119 @@ pub fn latest_url(page: i32) -> String {
     format!("{API_URL}/recent?type=all&page={page}")
 }
 
-/// Browse of every show, used by a search with no text.
-pub fn browse_url(page: i32) -> String {
-    format!("{BASE_URL}/api/anime?page={page}")
+/// Browse of every show, used by a search with no text: `/api/anime?page=N`, with `&filters=` when filters are set.
+pub fn browse_url(page: i32, filters: Option<&str>) -> String {
+    match filters {
+        Some(encoded) => format!("{BASE_URL}/api/anime?page={page}&filters={encoded}"),
+        None => format!("{BASE_URL}/api/anime?page={page}"),
+    }
+}
+
+/// `/api/{sub-page}?page=N`: the sub-page filter overrides the search and the other filters (Kotlin `SubPageFilter`).
+pub fn subpage_url(subpage: &str, page: i32) -> String {
+    format!("{BASE_URL}/api/{subpage}?page={page}")
+}
+
+/// The answer of a sub-page, read as the endpoint's shape (Kotlin `searchAnimeParse`): `anime` is a search page,
+/// `show/recent` the latest list, anything else (trending, popular) the popular list.
+pub fn parse_subpage(subpage: &str, body: &str, page: i32) -> Res<AnimesPage> {
+    match subpage {
+        "anime" => parse_search(body, page),
+        "show/recent" => parse_latest(body),
+        _ => parse_popular(body, page),
+    }
+}
+
+// ============================ Filters (ABI 1.5) ============================
+
+/// The sub-page choices (Kotlin `SUBPAGE`) by index: "<Select>" is none.
+const SUBPAGES: [&str; 5] = ["", "show/trending", "anime", "show/recent", "show/popular"];
+/// The status choices (Kotlin `STATUS`) by index, as the JSON text of the `status` value; "" is all.
+const STATUSES: [&str; 3] = ["", "\"finished\"", "\"airing\""];
+/// The type choices (Kotlin `TYPE`) by index, as the JSON text of the `type` value; "" is all.
+const TYPES: [&str; 7] = ["", "\"tv\"", "\"movie\"", "\"ona\"", "\"ova\"", "\"special\"", "\"tv_special\""];
+
+/// The filter called `name` in the app's FilterList (ABI 1.5), by its body; `None` when the app sent no such filter.
+fn filter<'a>(filters: &'a [Value], name: &str) -> Option<&'a Value> {
+    filters
+        .iter()
+        .filter_map(|f| f.as_object()?.values().next())
+        .find(|body| body.get("name").and_then(Value::as_str) == Some(name))
+}
+
+/// The option a Select picked (its index), `None` when the filter is absent.
+fn picked_index(filters: &[Value], name: &str) -> Option<usize> {
+    usize::try_from(filter(filters, name)?.get("state")?.as_i64()?).ok()
+}
+
+/// The display value a Select picked (`values[state]`), `None` when absent.
+fn picked_value(filters: &[Value], name: &str) -> Option<String> {
+    let index = picked_index(filters, name)?;
+    filter(filters, name)?.get("values")?.as_array()?.get(index)?.as_str().map(str::to_owned)
+}
+
+/// The sub-page the app picked, `None` for "<Select>" or no filter.
+pub fn subpage(filters: &[Value]) -> Option<&'static str> {
+    SUBPAGES.get(picked_index(filters, "Sub-page")?).copied().filter(|s| !s.is_empty())
+}
+
+/// The JSON text of the filters that are set (Kotlin `getSearchParameters`): `{"genres":[...],"year":N,"status":"x",
+/// "type":"y"}`, the keys in that order. `{}` when none is set.
+pub fn filters_json(filters: &[Value]) -> String {
+    let mut parts: Vec<String> = Vec::new();
+    let genres: Vec<String> = filter(filters, "Genre")
+        .and_then(|body| body.get("state")?.as_array())
+        .into_iter()
+        .flatten()
+        .filter_map(|item| {
+            let body = item.as_object()?.values().next()?;
+            if body.get("state")?.as_bool()? {
+                serde_json::to_string(body.get("name")?).ok()
+            } else {
+                None
+            }
+        })
+        .collect();
+    if !genres.is_empty() {
+        parts.push(format!("\"genres\":[{}]", genres.join(",")));
+    }
+    // The year is a number in the Kotlin, so only digits are written; "All" is no year.
+    if let Some(year) = picked_value(filters, "Year").filter(|y| !y.is_empty() && y.bytes().all(|b| b.is_ascii_digit())) {
+        parts.push(format!("\"year\":{year}"));
+    }
+    if let Some(status) = STATUSES.get(picked_index(filters, "Status").unwrap_or(0)).filter(|s| !s.is_empty()) {
+        parts.push(format!("\"status\":{status}"));
+    }
+    if let Some(kind) = TYPES.get(picked_index(filters, "Type").unwrap_or(0)).filter(|s| !s.is_empty()) {
+        parts.push(format!("\"type\":{kind}"));
+    }
+    format!("{{{}}}", parts.join(","))
+}
+
+/// The filters as the site wants them: standard base64 of [`filters_json`], or `None` when no filter is set (the Kotlin
+/// sends no `filters` then).
+pub fn encoded_filters(filters: &[Value]) -> Option<String> {
+    let json = filters_json(filters);
+    (json != "{}").then(|| base64(json.as_bytes()))
+}
+
+/// Standard base64 with padding (Kotlin `Base64.encodeToString(bytes, NO_WRAP)`).
+pub fn base64(bytes: &[u8]) -> String {
+    const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let mut out = String::with_capacity(bytes.len().div_ceil(3) * 4);
+    for chunk in bytes.chunks(3) {
+        let n = u32::from(chunk[0]) << 16
+            | u32::from(*chunk.get(1).unwrap_or(&0)) << 8
+            | u32::from(*chunk.get(2).unwrap_or(&0));
+        for i in 0..4 {
+            if i <= chunk.len() {
+                out.push(char::from(ALPHABET[((n >> (18 - 6 * i)) & 63) as usize]));
+            } else {
+                out.push('=');
+            }
+        }
+    }
+    out
 }
 
 /// More pages while `page_count > page`.
@@ -206,9 +317,13 @@ pub fn parse_search(body: &str, page: i32) -> Res<AnimesPage> {
 
 // ================================ Search ===============================
 
-/// The JSON body of a text search (`POST /api/fsearch`).
-pub fn search_body(page: i32, query: &str) -> String {
-    serde_json::json!({ "page": page, "query": query }).to_string()
+/// The JSON body of a text search (`POST /api/fsearch`), with the encoded filters when there are any.
+pub fn search_body(page: i32, query: &str, filters: Option<&str>) -> String {
+    let mut body = serde_json::json!({ "page": page, "query": query });
+    if let Some(encoded) = filters {
+        body["filters"] = Value::String(encoded.to_owned());
+    }
+    body.to_string()
 }
 
 /// The Referer a search sends (Kotlin `searchAnimeRequest`).
@@ -249,9 +364,9 @@ pub fn parse_languages(body: &str) -> Res<Vec<String>> {
     Ok(decode::<Languages>(body)?.result)
 }
 
-/// The label of a language code, or the code itself when the site uses one the Kotlin list does not name.
+/// The label of a language code (Kotlin `getLocale`): "" for a code the Kotlin list does not name.
 pub fn locale_name(code: &str) -> String {
-    LOCALES.iter().find(|(c, _)| *c == code).map(|(_, name)| (*name).to_owned()).unwrap_or_else(|| code.to_owned())
+    LOCALES.iter().find(|(c, _)| *c == code).map(|(_, name)| (*name).to_owned()).unwrap_or_default()
 }
 
 /// `/api/show/{slug}` with its `/language` list: the synopsis, then the dub languages, season and year.
@@ -379,10 +494,53 @@ mod tests {
 
     #[test]
     fn a_text_search_posts_json_and_reads_max_page() {
-        assert_eq!(search_body(1, "frieren"), r#"{"page":1,"query":"frieren"}"#);
+        assert_eq!(search_body(1, "frieren", None), r#"{"page":1,"query":"frieren"}"#);
+        assert_eq!(
+            search_body(2, "frieren", Some("e30=")),
+            r#"{"filters":"e30=","page":2,"query":"frieren"}"#
+        );
         let page = parse_search(fixture("search.json"), 1).unwrap();
         assert!(!page.has_next_page, "maxPage is 1");
         assert_eq!(search_referer("a b"), "https://kaa.lt/search?q=a+b");
+    }
+
+    /// The app's filters in the serde form, and the Kotlin text and base64 they make (`getSearchParameters`).
+    #[test]
+    fn the_filters_are_the_kotlin_json_text_and_its_base64() {
+        let filters: Vec<Value> = serde_json::from_str(
+            r#"[
+                {"Group": {"name": "Genre", "state": [
+                    {"CheckBox": {"name": "Action", "state": true}},
+                    {"CheckBox": {"name": "Comedy", "state": false}},
+                    {"CheckBox": {"name": "Sci-Fi", "state": true}}]}},
+                {"Select": {"name": "Year", "values": ["All", "2024", "2023"], "state": 1}},
+                {"Select": {"name": "Status", "values": ["All", "Finished Airing", "Currently Airing"], "state": 2}},
+                {"Select": {"name": "Type", "values": ["All", "TV"], "state": 1}},
+                {"Select": {"name": "Sub-page", "values": ["<Select>", "Trending", "Anime"], "state": 0}}
+            ]"#,
+        )
+        .unwrap();
+        let text = r#"{"genres":["Action","Sci-Fi"],"year":2024,"status":"airing","type":"tv"}"#;
+        assert_eq!(filters_json(&filters), text);
+        assert_eq!(encoded_filters(&filters), Some(base64(text.as_bytes())));
+        assert_eq!(subpage(&filters), None, "<Select> is no sub-page");
+        assert_eq!(filters_json(&[]), "{}");
+        assert_eq!(encoded_filters(&[]), None, "no filter, no filters parameter");
+        assert_eq!(browse_url(1, Some("e30=")), "https://kaa.lt/api/anime?page=1&filters=e30=");
+    }
+
+    #[test]
+    fn a_sub_page_overrides_the_search_and_is_read_as_its_endpoint() {
+        let picked: Vec<Value> = serde_json::from_str(
+            r#"[{"Select": {"name": "Sub-page", "values": ["<Select>", "Trending", "Anime"], "state": 2}}]"#,
+        )
+        .unwrap();
+        assert_eq!(subpage(&picked), Some("anime"));
+        assert_eq!(subpage_url("anime", 2), "https://kaa.lt/api/anime?page=2");
+        assert_eq!(base64(b"f"), "Zg==");
+        assert_eq!(base64(b"fo"), "Zm8=");
+        assert_eq!(base64(b"foo"), "Zm9v");
+        assert_eq!(base64(b"foob"), "Zm9vYg==");
     }
 
     #[test]
@@ -401,7 +559,10 @@ mod tests {
         assert_eq!(anime.title, "Sousou no Frieren");
         assert_eq!(anime.url, "/sousou-no-frieren-2d15");
         let description = anime.description.unwrap();
-        assert!(description.contains("Available Dub Languages: Japanese, English, es-419, Spanish (España)\n"));
+        assert!(
+            description.contains("Available Dub Languages: Japanese, English, , Spanish (España)\n"),
+            "a code the Kotlin list does not name has the empty label, as in the Kotlin"
+        );
         assert!(description.contains("Season: Fall\n"));
         assert!(description.ends_with("Year: 2023"));
     }

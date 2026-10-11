@@ -116,9 +116,9 @@ Status as of 2026-10-11.
 | `gwtb` (Gone with the Blastwave) | manga | en | recipe | recipe done; its chapter links needed an engine fix |
 | `beatzanime` | anime | es | recipe | browse, details and episode list work; search and playback do not yet (see NEEDS-ENGINE.md) |
 | `parked/kimoitv` | anime | en | parked, not offered | no playback: the site's Cloudflare Turnstile bot check blocks it |
-| `weebcentral` | manga | en | WASM plug-in | `dist/weebcentral.wasm` (942 KB, no WASI imports); not run in the app yet |
-| `comix` | manga | en | WASM plug-in | not built yet, not in the index; the Rust version works against the live site |
-| `kickassanime` | anime | en | WASM plug-in | not built yet, not in the index; the Rust version plays HLS with subtitles and audio tracks |
+| `weebcentral` | manga | en | WASM plug-in | ABI 1.5 source, version 2 (filters, request headers, 2 s spacing; not built yet). `dist/weebcentral.wasm` is still the ABI 1.4 build (942 KB, no WASI imports); not run in the app yet |
+| `comix` | manga | en | WASM plug-in | ABI 1.5 source, version 2 (filters, upload dates, page-image headers, retries; not built yet, not in the index); the Rust version works against the live site |
+| `kickassanime` | anime | en | WASM plug-in | ABI 1.5 source, version 2 (filters, sub-pages, request headers; not built yet, not in the index); the Rust version plays HLS with subtitles and audio tracks |
 | `parked/animepahe` | anime | en | parked, not offered | the site's Cloudflare challenge cannot be passed by a sandboxed plug-in |
 
 The plug-ins are not verified against the live sites from inside the app's sandbox host.

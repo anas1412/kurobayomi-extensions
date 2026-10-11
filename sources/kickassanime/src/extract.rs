@@ -54,22 +54,29 @@ pub fn player_url(src: &str) -> Result<Url, String> {
     Ok(url)
 }
 
-/// The headers the player must send with the playlist, the segments and the subtitles: no Referer, the Origin of the
-/// player page and a fixed mobile Chrome user agent.
-pub fn video_headers(player: &Url) -> Vec<(String, String)> {
-    let host = player.host_str().unwrap_or_default();
+/// The headers of a video request of this source, except the Origin: no Referer, a fixed mobile Chrome user agent. The
+/// ABI 1.5 `request-headers` answers these (the Origin depends on the player's host, so it is not in that list).
+pub fn common_headers() -> Vec<(String, String)> {
     [
-        ("Accept", "*/*".to_owned()),
-        ("Accept-Language", "en-US,en;q=0.9".to_owned()),
-        ("Origin", format!("https://{host}")),
-        ("Sec-Fetch-Dest", "empty".to_owned()),
-        ("Sec-Fetch-Mode", "cors".to_owned()),
-        ("Sec-Fetch-Site", "same-site".to_owned()),
-        ("User-Agent", VIDEO_USER_AGENT.to_owned()),
+        ("Accept", "*/*"),
+        ("Accept-Language", "en-US,en;q=0.9"),
+        ("Sec-Fetch-Dest", "empty"),
+        ("Sec-Fetch-Mode", "cors"),
+        ("Sec-Fetch-Site", "same-site"),
+        ("User-Agent", VIDEO_USER_AGENT),
     ]
     .into_iter()
-    .map(|(k, v)| (k.to_owned(), v))
+    .map(|(k, v)| (k.to_owned(), v.to_owned()))
     .collect()
+}
+
+/// The headers the player must send with the playlist, the segments and the subtitles: [`common_headers`] and the
+/// Origin of the player page.
+pub fn video_headers(player: &Url) -> Vec<(String, String)> {
+    let host = player.host_str().unwrap_or_default();
+    let mut headers = common_headers();
+    headers.push(("Origin".to_owned(), format!("https://{host}")));
+    headers
 }
 
 /// Normalises a URL the players give (Kotlin `fixUrl`): `https:////host/x` and `////host/x` become `https://host/x`,
@@ -428,13 +435,15 @@ fn title_height(title: &str) -> i64 {
 }
 
 /// The Kotlin `sortVideos` without its speed term (the titles here never carry a `KB/s` speed): the preferred server
-/// first, then the preferred quality, then the height.
+/// first, then the preferred quality, then the height. The Kotlin sorts ascending and then reverses the list, so equal
+/// keys come out in reverse order; this does the same.
 pub fn sort_videos(mut videos: Vec<Video>, server: &str, quality: &str) -> Vec<Video> {
     let server = server.to_lowercase();
     videos.sort_by_key(|v| {
         let title = &v.video_title;
-        Reverse((title.to_lowercase().contains(&server), title.contains(quality), title_height(title)))
+        (title.to_lowercase().contains(&server), title.contains(quality), title_height(title))
     });
+    videos.reverse();
     videos
 }
 

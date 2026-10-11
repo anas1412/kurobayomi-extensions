@@ -1,4 +1,4 @@
-//! KickAssAnime (<https://kaa.lt>) as a Kurobayomi source plug-in, ABI 1.4 (`wit/kuro-source.wit`), anime ops only.
+//! KickAssAnime (<https://kaa.lt>) as a Kurobayomi source plug-in, ABI 1.5 (`wit/kuro-source.wit`), anime ops only.
 //! The logic is ported from the yuzono `en/kickassanime` extension (Apache-2.0); see README.md. Every network call goes
 //! through the host's `http` import, which refuses hosts outside `manifest.toml`.
 
@@ -97,6 +97,9 @@ struct PageArgs {
 struct SearchArgs {
     page: i32,
     query: String,
+    /// The app's Filter list (ABI 1.5): the serde form of each filter. Empty when the app holds none.
+    #[serde(default)]
+    filters: Vec<Value>,
 }
 
 #[derive(Deserialize)]
@@ -142,6 +145,8 @@ fn latest(input: &str) -> Res<AnimesPage> {
     api::parse_latest(&get(&api::latest_url(a.page), &[])?)
 }
 
+/// A search (Kotlin `getSearchAnime`): a slug or a link names one show; a sub-page filter replaces the search; no text
+/// browses with the filters; text posts them with the query. The Referer is the search page of the query.
 fn search(input: &str) -> Res<AnimesPage> {
     let a: SearchArgs = args(input)?;
     if let Some(slug) = api::slug_of_query(&a.query)? {
@@ -149,13 +154,21 @@ fn search(input: &str) -> Res<AnimesPage> {
         return Ok(AnimesPage { animes: vec![anime], has_next_page: false });
     }
     let referer = api::search_referer(&a.query);
-    let accept = "application/json, text/plain, */*";
+    let headers = [
+        ("Accept", "application/json, text/plain, */*"),
+        ("Referer", referer.as_str()),
+        ("Content-Type", "application/json"),
+    ];
+    if let Some(subpage) = api::subpage(&a.filters) {
+        let body = get(&api::subpage_url(subpage, a.page), &headers)?;
+        return api::parse_subpage(subpage, &body, a.page);
+    }
+    let filters = api::encoded_filters(&a.filters);
     if a.query.trim().is_empty() {
-        let body = get(&api::browse_url(a.page), &[("Accept", accept), ("Referer", referer.as_str())])?;
+        let body = get(&api::browse_url(a.page, filters.as_deref()), &headers)?;
         api::parse_search(&body, a.page)
     } else {
-        let headers = [("Accept", accept), ("Referer", referer.as_str()), ("Content-Type", "application/json")];
-        let body = send("POST", api::FSEARCH_URL, &headers, Some(&api::search_body(a.page, &a.query)))?;
+        let body = send("POST", api::FSEARCH_URL, &headers, Some(&api::search_body(a.page, &a.query, filters.as_deref())))?;
         api::parse_search(&body, a.page)
     }
 }
@@ -196,15 +209,10 @@ fn servers(episode_url: &str) -> Res<Vec<api::Server>> {
     api::parse_servers(&get(&api::servers_url(episode_url), &[])?)
 }
 
-/// One hoster per server, the preferred server first. Its videos are read later, with the `videos` op.
+/// One hoster per server, in the site's order. Its videos are read later, with the `videos` op.
 fn hosters(input: &str) -> Res<Vec<Hoster>> {
     let episode = args::<EpisodeArgs>(input)?.episode.url;
-    let mut hosters: Vec<Hoster> = servers(&episode)?
-        .into_iter()
-        .map(|s| Hoster { hoster_url: s.src, hoster_name: s.name })
-        .collect();
-    hosters.sort_by_key(|h| h.hoster_name != SERVER);
-    Ok(hosters)
+    Ok(servers(&episode)?.into_iter().map(|s| Hoster { hoster_url: s.src, hoster_name: s.name }).collect())
 }
 
 /// The videos of one server: its player page, then the manifest it names, split per quality with the subtitles.
@@ -231,7 +239,8 @@ fn server_videos(name: &str, src: &str) -> Res<Vec<Video>> {
     })
 }
 
-/// The videos of one hoster, sorted; or, for an episode, every server's videos (a failing server is skipped).
+/// The videos of one hoster, sorted; or, for an episode, every server's videos sorted the same way (a failing server is
+/// skipped). The Kotlin sorts the videos of an episode in `sortVideos` too.
 fn videos(input: &str) -> Res<Vec<Video>> {
     let a: VideosArgs = args(input)?;
     if let Some(hoster) = a.hoster {
@@ -248,7 +257,7 @@ fn videos(input: &str) -> Res<Vec<Video>> {
             Err(err) => warn(format!("kickassanime: server {} failed: {err}", server.name)),
         }
     }
-    Ok(all)
+    Ok(extract::sort_videos(all, SERVER, QUALITY))
 }
 
 fn json_out<T: serde::Serialize>(result: Res<T>) -> Res<String> {
@@ -262,6 +271,9 @@ impl Guest for Plugin {
         match op.as_str() {
             "info" => Ok(descriptor().to_string()),
             "create-sources" => Ok(json!([descriptor()]).to_string()),
+            // ABI 1.5: the headers of this source's video requests. The Origin is left out: it is the player's host, which
+            // each video carries in its own `headers` (`extract::video_headers`).
+            "request-headers" => Ok(json!(extract::common_headers()).to_string()),
             "popular" => json_out(popular(&input_json)),
             "latest" => json_out(latest(&input_json)),
             "search" => json_out(search(&input_json)),
@@ -275,3 +287,25 @@ impl Guest for Plugin {
 }
 
 export!(Plugin);
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// ABI 1.5 `request-headers`: the player's headers, with neither Referer nor Origin (each video has its Origin).
+    #[test]
+    fn the_request_headers_are_the_player_headers_without_referer_or_origin() {
+        let headers = <Plugin as Guest>::invoke("request-headers".into(), "{}".into()).unwrap();
+        let pairs: Vec<(String, String)> = serde_json::from_str(&headers).unwrap();
+        assert!(pairs.iter().all(|(k, _)| !k.eq_ignore_ascii_case("origin") && !k.eq_ignore_ascii_case("referer")));
+        assert!(pairs.iter().any(|(k, v)| k == "User-Agent" && v == extract::VIDEO_USER_AGENT));
+    }
+
+    #[test]
+    fn an_op_the_plug_in_does_not_answer_is_unknown() {
+        assert_eq!(
+            <Plugin as Guest>::invoke("chapters".into(), "{}".into()),
+            Err("unknown op: chapters".to_owned())
+        );
+    }
+}

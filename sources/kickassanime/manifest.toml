@@ -3,6 +3,6 @@ id = "kickassanime"
 name = "KickAssAnime"
 lang = "en"
 kind = "anime"
-version = 1
+version = 2
 # kaa.lt is the API; the player pages and their manifests are on krussdomi.com and its subdomains.
 hosts = ["kaa.lt", "krussdomi.com", "*.krussdomi.com"]

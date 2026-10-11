@@ -3,6 +3,7 @@
 //! (Apache-2.0). The parsers are tested over pages saved from the site on 2026-10-10 (`fixtures/`).
 
 use scraper::{ElementRef, Html, Selector};
+use serde_json::Value;
 use url::Url;
 
 use crate::{WireChapter, WireManga, WireMangasPage};
@@ -26,22 +27,86 @@ pub fn page(path: &str) -> Result<Url, String> {
     Url::parse(&format!("{BASE_URL}{path}")).map_err(|e| e.to_string())
 }
 
-/// `/search/data` for one page, with the default filters and the given sort ("Popularity", "Latest Updates" or
-/// "Best Match"). The characters `!#:(),-` of the query become spaces, as the Kotlin does.
-pub fn listing_url(page_number: i32, query: &str, sort: &str) -> Result<Url, String> {
+/// The body of a serde-form filter: `{"Select": {...}}` gives `{...}`.
+fn inner(value: &Value) -> Option<&Value> {
+    value.as_object()?.values().next()
+}
+
+/// The filter called `name` in the app's FilterList (ABI 1.5), by its body. `None` when the app sent no such filter.
+fn find<'a>(filters: &'a [Value], name: &str) -> Option<&'a Value> {
+    filters.iter().filter_map(inner).find(|body| body.get("name").and_then(Value::as_str) == Some(name))
+}
+
+/// The value a Select filter picked (`values[state]`), or `default` when the filter is absent.
+fn picked(filters: &[Value], name: &str, default: &str) -> String {
+    find(filters, name)
+        .and_then(|body| {
+            let index = usize::try_from(body.get("state")?.as_i64()?).ok()?;
+            body.get("values")?.as_array()?.get(index)?.as_str().map(str::to_owned)
+        })
+        .unwrap_or_else(|| default.to_owned())
+}
+
+/// The text of a Text filter, empty when absent.
+fn text_of(filters: &[Value], name: &str) -> String {
+    find(filters, name).and_then(|body| body.get("state")?.as_str().map(str::to_owned)).unwrap_or_default()
+}
+
+/// The options of a Group filter as `(name, state)`, in the app's order. Empty when absent.
+fn options(filters: &[Value], name: &str) -> Vec<(String, Value)> {
+    find(filters, name)
+        .and_then(|body| body.get("state")?.as_array())
+        .map(|items| {
+            items
+                .iter()
+                .filter_map(inner)
+                .filter_map(|item| Some((item.get("name")?.as_str()?.to_owned(), item.get("state")?.clone())))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// `/search/data` for one page. `sort` is the sort of a listing ("Popularity", "Latest Updates"); `None` reads the
+/// "Sort" filter (default "Best Match"). The other filters are read by their Kotlin names, and an absent one takes
+/// its Kotlin default. The characters `!#:(),-` of the query become spaces, as the Kotlin does.
+pub fn listing_url(page_number: i32, query: &str, sort: Option<&str>, filters: &[Value]) -> Result<Url, String> {
     let text = query.replace(|c: char| "!#:(),-".contains(c), " ");
+    let sort = sort.map_or_else(|| picked(filters, "Sort", "Best Match"), str::to_owned);
     let offset = page_number.max(1).saturating_sub(1).saturating_mul(PAGE_SIZE);
+    let mut pairs = vec![
+        ("text".to_owned(), text.trim().to_owned()),
+        ("sort".to_owned(), sort),
+        ("order".to_owned(), picked(filters, "Sort Order", "Descending")),
+        ("official".to_owned(), picked(filters, "Official Translation", "Any")),
+        ("anime".to_owned(), picked(filters, "Anime Adaptation", "Any")),
+        ("adult".to_owned(), picked(filters, "Adult Content", "Any")),
+    ];
+    let author = text_of(filters, "Author (Case-sensitive)");
+    if !author.is_empty() {
+        pairs.push(("author".to_owned(), author));
+    }
+    for (name, state) in options(filters, "Series Status") {
+        if state.as_bool() == Some(true) {
+            pairs.push(("included_status".to_owned(), name));
+        }
+    }
+    for (name, state) in options(filters, "Series Type") {
+        if state.as_bool() == Some(true) {
+            pairs.push(("included_type".to_owned(), name));
+        }
+    }
+    for (name, state) in options(filters, "Tags") {
+        match state.as_i64() {
+            Some(1) => pairs.push(("included_tag".to_owned(), name)),
+            Some(2) => pairs.push(("excluded_tag".to_owned(), name)),
+            _ => {}
+        }
+    }
+    pairs.push(("limit".to_owned(), PAGE_SIZE.to_string()));
+    pairs.push(("offset".to_owned(), offset.to_string()));
+    pairs.push(("display_mode".to_owned(), "Full Display".to_owned()));
     let mut url = page("/search/data")?;
-    url.query_pairs_mut()
-        .append_pair("text", text.trim())
-        .append_pair("sort", sort)
-        .append_pair("order", "Descending")
-        .append_pair("official", "Any")
-        .append_pair("anime", "Any")
-        .append_pair("adult", "Any")
-        .append_pair("limit", &PAGE_SIZE.to_string())
-        .append_pair("offset", &offset.to_string())
-        .append_pair("display_mode", "Full Display");
+    url.query_pairs_mut().extend_pairs(pairs);
     Ok(url)
 }
 
@@ -406,17 +471,45 @@ mod tests {
 
     #[test]
     fn listing_urls_match_the_kotlin() {
-        let popular = listing_url(1, "", "Popularity").unwrap();
+        let popular = listing_url(1, "", Some("Popularity"), &[]).unwrap();
         assert_eq!(
             popular.as_str(),
             "https://weebcentral.com/search/data?text=&sort=Popularity&order=Descending&official=Any&anime=Any&adult=Any&limit=32&offset=0&display_mode=Full+Display"
         );
-        let latest = listing_url(3, "", "Latest Updates").unwrap();
+        let latest = listing_url(3, "", Some("Latest Updates"), &[]).unwrap();
         assert!(latest.as_str().contains("sort=Latest+Updates") && latest.as_str().contains("offset=64"), "{latest}");
-        let search = listing_url(1, "One Piece: Party (x)", "Best Match").unwrap();
+        let search = listing_url(1, "One Piece: Party (x)", None, &[]).unwrap();
         assert!(
             search.as_str().starts_with("https://weebcentral.com/search/data?text=One+Piece++Party++x&sort=Best+Match&"),
             "{search}"
+        );
+    }
+
+    /// The app's FilterList (ABI 1.5) in the serde form: the Kotlin filter names, with the states a user picks.
+    #[test]
+    fn the_filters_become_the_kotlin_query_parameters() {
+        let filters: Vec<Value> = serde_json::from_str(
+            r#"[
+                {"Select": {"name": "Sort", "values": ["Best Match", "Alphabet", "Popularity"], "state": 2}},
+                {"Select": {"name": "Sort Order", "values": ["Descending", "Ascending"], "state": 1}},
+                {"Text": {"name": "Author (Case-sensitive)", "state": "Oda"}},
+                {"Group": {"name": "Series Status", "state": [
+                    {"CheckBox": {"name": "Ongoing", "state": true}},
+                    {"CheckBox": {"name": "Complete", "state": false}}]}},
+                {"Group": {"name": "Series Type", "state": [{"CheckBox": {"name": "Manhwa", "state": true}}]}},
+                {"Group": {"name": "Tags", "state": [
+                    {"TriState": {"name": "Action", "state": 1}},
+                    {"TriState": {"name": "Adult", "state": 2}},
+                    {"TriState": {"name": "Drama", "state": 0}}]}}
+            ]"#,
+        )
+        .unwrap();
+        let url = listing_url(2, "", None, &filters).unwrap();
+        assert!(
+            url.as_str().contains(
+                "sort=Popularity&order=Ascending&official=Any&anime=Any&adult=Any&author=Oda&included_status=Ongoing&included_type=Manhwa&included_tag=Action&excluded_tag=Adult&limit=32&offset=32"
+            ),
+            "{url}"
         );
     }
 

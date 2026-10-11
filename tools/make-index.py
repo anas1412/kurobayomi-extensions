@@ -116,6 +116,8 @@ def build_index(root, base_url):
             "sha256": hashlib.sha256(data).hexdigest(),
             "type": kind_type,
         })
+        if kind_type == "wasm":
+            entries[-1]["hosts"] = hosts
     for kind in KINDS:
         count = sum(1 for entry in entries if entry["kind"] == kind)
         if count > LIMIT_PER_KIND:

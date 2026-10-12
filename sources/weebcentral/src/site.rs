@@ -345,13 +345,14 @@ pub fn parse_chapters(html: &str, base: &Url) -> Result<Vec<WireChapter>, String
                 .select(&images)
                 .any(|img| attr(img, "src").is_some_and(|s| s.to_lowercase().contains("official")));
             let chapter_number = if has_season(&name) { (total - index) as f32 } else { -1.0 };
-            let scanlator = if official { "Official" } else { "Unknown" };
+            // no group is named on the page: send none rather than a placeholder the app would have to hide
+            let scanlator = official.then_some("Official");
             Ok(WireChapter {
                 url: path_of(&href),
                 name,
                 date_upload,
                 chapter_number,
-                scanlator: Some(scanlator.to_owned()),
+                scanlator: scanlator.map(str::to_owned),
             })
         })
         .collect()
@@ -455,7 +456,7 @@ mod tests {
         assert_eq!(c.url, "/chapters/01M4FFVTBPS4RKXQWZ2REYGH3M");
         assert_eq!(c.date_upload, 1_791_521_319_286);
         assert_eq!(c.chapter_number, -1.0, "no season: the app parses the number from the name");
-        assert_eq!(c.scanlator.as_deref(), Some("Unknown"));
+        assert_eq!(c.scanlator.as_deref(), None, "no placeholder group");
         assert_eq!(chapters.last().unwrap().name, "Chapter 1");
         assert_eq!(chapters.last().unwrap().scanlator.as_deref(), Some("Official"));
     }

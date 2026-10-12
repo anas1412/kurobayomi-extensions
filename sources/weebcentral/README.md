@@ -21,7 +21,7 @@ Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
 - Spacing (ABI 1.5 `requestGapMs`): 2000 ms between two requests to the site, as the Kotlin `rateLimit(1, 2.seconds)`.
 - Details: title, author, genres with type, status, cover, description with related series, alternate names and tracker
   links.
-- Chapters: newest first, dates (epoch milliseconds, read from the page's `datetime`), "Official" or "Unknown" scanlator,
+- Chapters: newest first, dates (epoch milliseconds, read from the page's `datetime`), "Official" as the scanlator when the page marks it (none otherwise),
   position numbering for names with a season.
 - Pages: the long-strip page images, in order.
 

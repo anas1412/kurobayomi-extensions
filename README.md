@@ -65,7 +65,7 @@ Developers can test a recipe without a repository: copy `sources/<id>/recipe.tom
 ### A WASM plug-in
 
 1. Copy the starter: `cp -r template sources/<id>`. Rename the package in `Cargo.toml` and write the ops in `src/lib.rs`
-   against `wit/kuro-source.wit` (ABI 1.4).
+   against `wit/kuro-source.wit` (ABI 1.5).
 2. Create `sources/<id>/manifest.toml`:
 
    ```toml
@@ -82,6 +82,12 @@ Developers can test a recipe without a repository: copy `sources/<id>/recipe.tom
 
 The plug-in calls the network only through the host's `http` import. The plug-in itself is never listed unless its file is
 in `dist/`.
+
+### The source's icon
+
+Put the site's icon in `sources/<id>/icon.png` (a square PNG, 192 x 192 is plenty). `tools/make-index.py` publishes it
+as `dist/<id>.png` and lists it in the index, and the app shows it in the source lists. Without one the app shows a
+letter tile.
 
 ## Build and index
 

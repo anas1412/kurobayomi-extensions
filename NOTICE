@@ -4,3 +4,6 @@ The sources in sources/ and the built files in dist/ are ports of open-source An
 yuzono and others), licensed under the Apache License, Version 2.0. The full text is in LICENSE. Each source's README.md
 names its original and what was changed. Changed files carry this notice of modification: they are rewritten as Kurobayomi
 text recipes or WASM plug-ins.
+
+The site icons (sources/<id>/icon.png, published as dist/<id>.png) are the launcher icons of the same extensions,
+copied unchanged from their res/mipmap-xxxhdpi/ic_launcher.png.

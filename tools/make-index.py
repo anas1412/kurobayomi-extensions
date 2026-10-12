@@ -118,12 +118,19 @@ def build_index(root, base_url):
         })
         if kind_type == "wasm":
             entries[-1]["hosts"] = hosts
+        # the site's icon (sources/<id>/icon.png, a square PNG), shown in the app's source lists
+        icon = folder / "icon.png"
+        if icon.is_file():
+            dist_icon = dist / f"{folder.name}.png"
+            shutil.copyfile(icon, dist_icon)
+            entries[-1]["icon"] = f"{base_url}/{dist_icon.relative_to(root).as_posix()}"
+            entries[-1]["iconSha256"] = hashlib.sha256(dist_icon.read_bytes()).hexdigest()
     for kind in KINDS:
         count = sum(1 for entry in entries if entry["kind"] == kind)
         if count > LIMIT_PER_KIND:
             fail(f"{count} {kind} sources; a repository lists at most {LIMIT_PER_KIND} of each kind")
     # dist/ holds only what the index names: a source moved to parked/ or removed must not leave its file behind.
-    named = {Path(entry["file"]).name for entry in entries}
+    named = {Path(entry["file"]).name for entry in entries} | {Path(entry["icon"]).name for entry in entries if "icon" in entry}
     for stale in sorted(dist.iterdir()) if dist.is_dir() else []:
         if stale.is_file() and stale.name not in named:
             print(f"removing stale dist/{stale.name}", file=sys.stderr)

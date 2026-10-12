@@ -1,130 +1,138 @@
 # Kurobayomi extensions
 
-Sources for [Kurobayomi](https://github.com/anas1412/kurobayomi). One folder per source, `sources/<id>/`. A source's kind
-(manga or anime) is a field of its file, not a folder. A source is either a text recipe or a WASM plug-in.
+Sources for [Kurobayomi](https://github.com/anas1412/kurobayomi), the anime and manga app for the Linux desktop.
+Kurobayomi ships with no sources: you add a repository like this one by its link, and its sources appear in the app at
+once. There is no install step.
 
-Sources are ported from open-source Aniyomi and Mihon extension repositories (Apache-2.0; see `LICENSE` and `NOTICE`). Each source's README names the
-original and what was changed.
+Every source here is a port of an open-source Aniyomi or Mihon extension (Apache-2.0; see [LICENSE](LICENSE) and
+[NOTICE](NOTICE)). Each source's own README names the original and what was changed.
+
+## Add this repository to Kurobayomi
+
+1. Open Kurobayomi and click **Add a source repository** (or **Browse → menu → Repositories → Add**).
+2. Paste this link and click **Add**:
+
+   ```
+   https://raw.githubusercontent.com/anas1412/kurobayomi-extensions/main/index.min.json
+   ```
+
+3. The sources show up in **Browse** right away, grouped by language.
+
+The app checks the repository once a day and picks up fixes and new sources on its own. To remove the repository,
+remove its link under **Repositories**; its sources go with it. A step-by-step guide with screenshots is in the app's
+[Getting started](https://github.com/anas1412/kurobayomi/blob/main/docs/GETTING-STARTED.md).
+
+## Sources
+
+| | Source | Kind | Language | Type | Notes |
+|---|---|---|---|---|---|
+| <img src="sources/weebcentral/icon.png" width="24"> | Weeb Central | manga | en | plug-in | filters, 2 s between requests |
+| <img src="sources/existentialcomics/icon.png" width="24"> | Existential Comics | manga | en | recipe | |
+| <img src="sources/gwtb/icon.png" width="24"> | Gone with the Blastwave | manga | en | recipe | |
+| <img src="sources/kickassanime/icon.png" width="24"> | KickAssAnime | anime | en | plug-in | HLS with subtitles and audio tracks; details with synopsis, genres and status |
+| <img src="sources/beatzanime/icon.png" width="24"> | BeatZ Anime | anime | es | recipe | browse, details and episodes; search and playback need engine work ([NEEDS-ENGINE.md](NEEDS-ENGINE.md)) |
+
+Not offered (in `parked/`):
+
+| Source | Why |
+|---|---|
+| Comix | the site retired the keys its API requests are signed with; it comes back when they are re-captured (`parked/comix/capture.js`) |
+| AnimePahe | the site's Cloudflare challenge cannot be passed by a sandboxed plug-in |
+| KimoiTV | the site's Cloudflare Turnstile check blocks playback |
+
+## How a source works
+
+A source is one of two things:
+
+- **A text recipe** (`recipe.toml`): CSS selectors and a few rules for simple sites. No code runs.
+- **A WASM plug-in**: a small Rust crate built into a WebAssembly component. It runs in the app's sandbox, with no file
+  or system access, and may reach only the hosts listed in its `manifest.toml`. Its interface (ABI 1.5) is described in
+  the app's [docs/source-abi.md](https://github.com/anas1412/kurobayomi/blob/main/docs/source-abi.md).
+
+Each source may also carry its site's icon, which the app shows in its source lists.
 
 ## Layout
 
 ```
 sources/<id>/         one folder per source
-  manifest.toml       a WASM plug-in: id, name, lang, kind, version, hosts
+  manifest.toml       a plug-in: id, name, lang, kind, version, hosts
   Cargo.toml, src/    the plug-in crate
   recipe.toml         or a text recipe: id, name, lang, kind, base_urls, selectors
-  fixtures/           saved pages or responses the tests use
-  README.md           what the source does, its licence, what was changed
-parked/<id>/          sources kept but not offered (not read by the index tool)
-template/             starter crate for a new plug-in: copy it to sources/<id>/
-dist/                 built files the index links to: <id>.wasm and <id>.toml (committed)
-tools/build.sh        builds every plug-in under sources/ into dist/
-tools/make-index.py   copies recipes into dist/ and writes index.min.json
-index.min.json        generated, never edit by hand
-NEEDS-ENGINE.md       engine changes that the recipes need
-LICENSE, NOTICE       Apache License 2.0 text and the notice for the ported sources and the files in dist/
+  icon.png            the site's icon (square PNG)
+  fixtures/           saved pages and responses the tests use
+  README.md           what the source does, its original and licence, what was changed
+parked/<id>/          sources kept but not offered
+template/             starter crate for a new plug-in
+dist/                 the files the index links to: <id>.wasm, <id>.toml, <id>.png (committed)
+tools/build.sh        builds every plug-in into dist/
+tools/make-index.py   copies recipes and icons into dist/ and writes index.min.json
+index.min.json        generated; never edit by hand
 ```
-
-## How to add this repository to the app
-
-**Not working in the current app.** The app's add-link step (`extension_store::add_store`) reads a legacy repo (`meta`) or a
-store (`name`, `badgeLabel`, `signingKey`, `contact`), not this index (`{"version":1,"sources":[...]}`). The only parser for
-this format, `crates/kuro-extensions/src/repo.rs`, is not called anywhere yet. Which format the app reads is open: either
-this tool emits the store format or the app wires `repo.rs` in. The steps below describe the intended flow.
-
-Also open (app side): the app does not read this repo's `manifest.toml`. `kuro-source-wasm` takes `hosts` from a `manifest.json`
-inside a `.kuroext` zip, and `kuro-extensions` (folder with `manifest.toml` + `component.wasm`, no `hosts` field) passes an empty
-list to `instantiate`, so every `http` call would be refused. Until the app picks one package format and carries `hosts` through, a
-plug-in from this index cannot fetch. The packaging step must then derive that format (pkg, versionName, versionCode, abi, baseUrl,
-source id) from `manifest.toml` and the index entry. Also not wired in the app yet: `scan_and_instantiate` is never called from `src/`.
-
-Kurobayomi ships with no online sources. You add a repository by its link, and its sources appear at once. There is no
-install step.
-
-1. In Kurobayomi open **Browse**, then the menu, then **Extension repos**, and add this link:
-   `https://raw.githubusercontent.com/anas1412/kurobayomi-extensions/main/index.min.json`
-2. Browse lists the sources of the repository, grouped by language, with a language filter.
-3. A source's file is downloaded the first time you open that source, and its checksum is checked against the index.
-   The daily update check refreshes the index and the files.
-4. To remove the repository, remove its link in **Extension repos**; its sources go with it.
-
-A repository lists at most 10 sources of each kind (manga and anime).
-
-Developers can test a recipe without a repository: copy `sources/<id>/recipe.toml` to
-`~/.local/share/kurobayomi/scrapers/<id>.toml` and restart the app.
 
 ## Add a source
 
-### A text recipe
+**A text recipe**
 
-1. Create `sources/<id>/recipe.toml`. Its `id` must equal the folder name. It carries its own `id`, `name`, `lang` and
-   `kind` (`manga` or `anime`), and an optional `version` (default 1).
-2. Add `fixtures/` with saved pages, and a `README.md` that names the original and its licence if the recipe is ported.
+1. Create `sources/<id>/recipe.toml`. Its `id` must equal the folder name; it also carries `name`, `lang`, `kind`
+   (`manga` or `anime`) and an optional `version`.
+2. Add `fixtures/` with saved pages, a `README.md`, and `icon.png` if the site has an icon.
 3. Run `python3 tools/make-index.py`.
 
-### A WASM plug-in
+**A WASM plug-in**
 
-1. Copy the starter: `cp -r template sources/<id>`. Rename the package in `Cargo.toml` and write the ops in `src/lib.rs`
-   against `wit/kuro-source.wit` (ABI 1.5).
+1. `cp -r template sources/<id>`, rename the package in `Cargo.toml`, and write the ops in `src/lib.rs` against
+   `wit/kuro-source.wit`.
 2. Create `sources/<id>/manifest.toml`:
 
    ```toml
-   id = "example"        # must equal the folder name
+   id = "example"            # must equal the folder name
    name = "Example"
    lang = "en"
-   kind = "manga"        # or "anime"
+   kind = "manga"            # or "anime"
    version = 1
-   hosts = ["example.org"]   # the hosts the plug-in may call
+   hosts = ["example.org"]   # the only hosts the plug-in may call
    ```
 
-3. Add `fixtures/` and a `README.md`, as for a recipe.
+3. Add `fixtures/`, a `README.md` and `icon.png`.
 4. Run `tools/build.sh`, then `python3 tools/make-index.py`.
 
-The plug-in calls the network only through the host's `http` import. The plug-in itself is never listed unless its file is
-in `dist/`.
-
-### The source's icon
-
-Put the site's icon in `sources/<id>/icon.png` (a square PNG, 192 x 192 is plenty). `tools/make-index.py` publishes it
-as `dist/<id>.png` and lists it in the index, and the app shows it in the source lists. Without one the app shows a
-letter tile.
+A plug-in must stay under 1 MiB. Bump `version` whenever a source changes, so the app's daily check fetches it again.
 
 ## Build and index
 
-Once: `rustup target add wasm32-unknown-unknown`, and `wasm-component-ld` must be on the path.
+Once: `rustup target add wasm32-unknown-unknown` (`wasm-component-ld` ships with Rust's wasip2 support).
 
-Plug-ins are built for `wasm32-unknown-unknown` and componentized by `wasm-component-ld`, not for `wasm32-wasip2`. A wasip2
-build imports `wasi:cli/*`, `wasi:io/*` and `wasi:clocks/*`, and the app's sandbox has no WASI (it links only
-`kuro:source/host`), so it could not start. `tools/build.sh` and `tools/make-index.py` reject any `.wasm` that names a
-`wasi:` interface.
+- `tools/build.sh` builds each plug-in for `wasm32-unknown-unknown` and turns it into a component with
+  `wasm-component-ld`. It is not built for `wasm32-wasip2`: the sandbox offers no WASI, so a plug-in that imports
+  `wasi:*` could not start, and both tools reject one.
+- `tools/make-index.py` copies recipes and icons into `dist/`, checks the plug-ins, removes files in `dist/` that no
+  entry names, and writes `index.min.json`.
 
-A plug-in must stay under 1 MiB (the app's limit). The starter profile sets `opt-level = "s"`, `lto`, `codegen-units = 1`,
-`panic = "abort"` and `strip`; record each plug-in's size in its README.
+Commit `dist/` and `index.min.json` together: the checksums in the index must match the files on the branch.
 
-- `tools/build.sh` builds each plug-in folder with `cargo build --release --target wasm32-unknown-unknown -j 1`, one at a time, and
-  copies the result to `dist/<id>.wasm`. Builds share `target/` at the repository root, which git ignores.
-- `tools/make-index.py` reads `sources/*/`, copies each recipe to `dist/<id>.toml`, checks plug-ins, deletes files in `dist/` that no entry names, and writes `index.min.json`. A plug-in
-  whose `dist/<id>.wasm` does not exist yet is skipped with a warning.
+## Index format
 
-Each index entry has `id`, `name`, `lang`, `kind`, `version`, `file` (the raw https link of the file in `dist/`), `sha256`
-(of that file's bytes) and `type` (`wasm` or `recipe`). The app stores the copy as `<id>.wasm` or `<id>.toml`, by the
-extension of the link. A file is at most 1 MiB.
+```json
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "example", "name": "Example", "lang": "en", "kind": "manga", "version": 1,
+      "type": "wasm",
+      "file": "https://raw.githubusercontent.com/<user>/<repo>/main/dist/example.wasm",
+      "sha256": "<hex>",
+      "hosts": ["example.org"],
+      "icon": "https://raw.githubusercontent.com/<user>/<repo>/main/dist/example.png",
+      "iconSha256": "<hex>"
+    }
+  ]
+}
+```
 
-Commit `dist/` and `index.min.json` together after a change, because the checksums must match the files on the branch.
+`hosts` is set for plug-ins only; `icon` and `iconSha256` are optional. All links must be https. A repository lists at
+most 10 sources of each kind.
 
-## Sources
+## Licence
 
-Status as of 2026-10-11.
-
-| Source | Kind | Lang | Type | Status |
-|---|---|---|---|---|
-| `existentialcomics` | manga | en | recipe | works |
-| `gwtb` (Gone with the Blastwave) | manga | en | recipe | recipe done; its chapter links needed an engine fix |
-| `beatzanime` | anime | es | recipe | browse, details and episode list work; search and playback do not yet (see NEEDS-ENGINE.md) |
-| `parked/kimoitv` | anime | en | parked, not offered | no playback: the site's Cloudflare Turnstile bot check blocks it |
-| `weebcentral` | manga | en | WASM plug-in | ABI 1.5 source, version 2 (filters, request headers, 2 s spacing; not built yet). `dist/weebcentral.wasm` is still the ABI 1.4 build (942 KB, no WASI imports); not run in the app yet |
-| `comix` | manga | en | WASM plug-in (parked) | Parked in `parked/comix`: the site retired the keys its API is signed with, so it lists nothing until the keys are re-captured. Not in the index. |
-| `kickassanime` | anime | en | WASM plug-in | ABI 1.5 source, version 2 (filters, sub-pages, request headers; not built yet, not in the index); the Rust version plays HLS with subtitles and audio tracks |
-| `parked/animepahe` | anime | en | parked, not offered | the site's Cloudflare challenge cannot be passed by a sandboxed plug-in |
-
-The plug-ins are not verified against the live sites from inside the app's sandbox host.
+Apache License 2.0. The sources are ports of Aniyomi and Mihon extensions; the site icons are those extensions' launcher
+icons. See [NOTICE](NOTICE).

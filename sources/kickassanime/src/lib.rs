@@ -277,6 +277,7 @@ impl Guest for Plugin {
             "popular" => json_out(popular(&input_json)),
             "latest" => json_out(latest(&input_json)),
             "search" => json_out(search(&input_json)),
+            "details" => json_out(args::<AnimeArgs>(&input_json).and_then(|a| details(&a.anime.url))),
             "episodes" => json_out(episodes(&input_json)),
             "hosters" => json_out(hosters(&input_json)),
             "videos" => json_out(videos(&input_json)),

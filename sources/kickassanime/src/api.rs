@@ -33,6 +33,19 @@ pub struct Anime {
     pub title: String,
     pub description: Option<String>,
     pub thumbnail_url: Option<String>,
+    /// Genres joined with ", " (Kotlin `genre`). Set by a details read only.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub genre: Option<String>,
+    /// SAnime status: 0 unknown, 1 ongoing, 2 completed. Set by a details read only.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub status: i32,
+    /// The studio. The show endpoint has none, so it stays empty.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub author: Option<String>,
+}
+
+fn is_zero(n: &i32) -> bool {
+    *n == 0
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -49,6 +62,8 @@ pub struct Episode {
     pub name: String,
     pub episode_number: f32,
     pub scanlator: Option<String>,
+    /// Epoch milliseconds of the episode's `created_at`; 0 when the API gives none (never "now").
+    pub date_upload: i64,
 }
 
 /// A server of an episode. Its videos are read later, with the `videos` op, so `videoList` is absent.
@@ -113,6 +128,10 @@ struct Info {
     synopsis: Option<String>,
     season: Option<String>,
     year: Option<i32>,
+    #[serde(default)]
+    genres: Vec<String>,
+    #[serde(default)]
+    status: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -133,6 +152,10 @@ struct EpisodeDto {
     slug: String,
     title: Option<String>,
     episode_string: String,
+    /// ISO-8601 UTC, as the recent list's `created_at`. The episode list of the sampled show has no date field, so
+    /// this is usually absent.
+    #[serde(default)]
+    created_at: Option<String>,
 }
 
 /// One server of an episode: its name (`VidStreaming`, `BirdStream`, ...) and its player page.
@@ -166,6 +189,9 @@ fn anime(item: Item) -> Res<Anime> {
         title: item.title,
         description: None,
         thumbnail_url: Some(poster_url(&item.poster.hq)),
+        genre: None,
+        status: 0,
+        author: None,
     })
 }
 
@@ -395,7 +421,44 @@ pub fn parse_details(body: &str, languages: &[String]) -> Res<Anime> {
         title: info.title,
         description: Some(description),
         thumbnail_url: Some(poster_url(&info.poster.hq)),
+        genre: Some(info.genres.join(", ")).filter(|g| !g.is_empty()),
+        status: parse_status(info.status.as_deref()),
+        author: None,
     })
+}
+
+/// Kotlin `parseStatus`: `finished_airing` is completed (2), `currently_airing` ongoing (1), else unknown (0).
+fn parse_status(status: Option<&str>) -> i32 {
+    match status {
+        Some("finished_airing") => 2,
+        Some("currently_airing") => 1,
+        _ => 0,
+    }
+}
+
+/// Epoch milliseconds of an ISO-8601 UTC timestamp (`2026-10-10T18:15:22.947Z`); 0 when it does not parse.
+pub fn iso_millis(text: &str) -> i64 {
+    fn num(s: &str) -> Option<i64> {
+        s.parse().ok()
+    }
+    let parse = || -> Option<i64> {
+        let (date, time) = text.trim().split_once('T')?;
+        let mut d = date.splitn(3, '-');
+        let (y, m, day) = (num(d.next()?)?, num(d.next()?)?, num(d.next()?)?);
+        let time = time.trim_end_matches('Z');
+        let (hms, frac) = time.split_once('.').unwrap_or((time, ""));
+        let mut t = hms.splitn(3, ':');
+        let (h, mi, s) = (num(t.next()?)?, num(t.next()?)?, num(t.next().unwrap_or("0"))?);
+        let ms = format!("{frac:0<3}").get(..3)?.parse::<i64>().ok()?;
+        // Days since 1970-01-01 (Hinnant's civil-from-days, inverted).
+        let y = if m <= 2 { y - 1 } else { y };
+        let era = y.div_euclid(400);
+        let yoe = y - era * 400;
+        let doy = (153 * (if m > 2 { m - 3 } else { m + 9 }) + 2) / 5 + day - 1;
+        let days = era * 146097 + yoe * 365 + yoe / 4 - yoe / 100 + doy - 719468;
+        Some(((days * 24 + h) * 60 + mi) * 60_000 + s * 1000 + ms).filter(|v| *v > 0)
+    };
+    parse().unwrap_or(0)
 }
 
 // ================================ Episodes =============================
@@ -432,6 +495,7 @@ impl EpisodePage {
                 url: format!("{anime_url}/ep-{}-{}", ep.episode_string, ep.slug),
                 episode_number: ep.episode_string.parse().unwrap_or(-1.0),
                 scanlator: Some(locale_name(lang)),
+                date_upload: ep.created_at.as_deref().map(iso_millis).unwrap_or(0),
             })
             .collect()
     }
@@ -565,6 +629,34 @@ mod tests {
         );
         assert!(description.contains("Season: Fall\n"));
         assert!(description.ends_with("Year: 2023"));
+        assert!(description.starts_with("During their decade-long quest"));
+        assert_eq!(anime.genre.as_deref(), Some("Adventure, Drama, Fantasy, Shounen"));
+        assert_eq!(anime.status, 2, "finished_airing is completed");
+        assert_eq!(anime.author, None, "the show endpoint has no studio");
+        assert_eq!(parse_status(Some("currently_airing")), 1);
+        assert_eq!(parse_status(Some("upcoming")), 0);
+        assert_eq!(parse_status(None), 0);
+    }
+
+    #[test]
+    fn iso_dates_become_epoch_milliseconds_and_unknown_is_zero() {
+        assert_eq!(iso_millis("1970-01-01T00:00:00.000Z"), 0);
+        assert_eq!(iso_millis("2026-10-10T18:15:22.947Z"), 1_791_656_122_947);
+        assert_eq!(iso_millis("2023-09-29T00:00:00Z"), 1_695_945_600_000);
+        assert_eq!(iso_millis("2024-02-29T12:00:00.5Z"), 1_709_208_000_500);
+        assert_eq!(iso_millis(""), 0);
+        assert_eq!(iso_millis("not a date"), 0);
+    }
+
+    #[test]
+    fn an_episode_without_a_date_is_zero_and_one_with_created_at_is_dated() {
+        let page = parse_episode_page(fixture("episodes.json")).unwrap();
+        assert!(page.episodes("/s", "ja-JP").iter().all(|e| e.date_upload == 0), "no date field: 0, never now");
+        let dated = parse_episode_page(
+            r#"{"pages":[],"result":[{"slug":"a","title":null,"episode_string":"1","created_at":"2023-09-29T00:00:00.000Z"}]}"#,
+        )
+        .unwrap();
+        assert_eq!(dated.episodes("/s", "ja-JP")[0].date_upload, 1_695_945_600_000);
     }
 
     #[test]

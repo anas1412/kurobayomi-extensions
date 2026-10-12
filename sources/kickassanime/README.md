@@ -51,8 +51,14 @@ player sends them with the playlist, the segments and the subtitles. The guest s
   branch is gone.
 - Deliberate difference: a link or `slug:` search stores the show as `/{slug}`, as a listing does. The Kotlin stores the
   request URL of the show's API (`/api/show/{slug}`), and its episode lookup then builds a doubled path and fails.
-- Not an op: anime details. The contract has no anime `details` op, so the synopsis, dub list and season come only with
-  a search by slug or link.
+- `details` (version 3): `{"anime": {"url"}}` answers `{url, title, description, thumbnailUrl, genre, status, author}`
+  from `GET /api/show/{slug}` (+ `/language`), as the Kotlin `animeDetailsParse`: the synopsis with the dub list, season
+  and year as the description, genres joined by ", ", status 1 for `currently_airing`, 2 for `finished_airing`, else 0.
+  `author` is absent: the show endpoint has no studio. A search by slug or link answers the same fields. The app's anime
+  wire (`anime_wire.rs`) does not read `genre`, `status` or `author` yet, and the host has no anime `details` call.
+- Episode dates (version 3): `dateUpload` is the episode's `created_at` in epoch milliseconds when the episode list gives
+  one, else 0. The Kotlin sets no date, and the sampled episode list has none, so 0 is the usual answer. Host side, a 0
+  date is stamped with the sync time.
 - Dropped the speed term of the video sort. Its pattern (`KB/s`) never matches the titles this source builds.
 - No regex and no chrono: the HLS attribute reader splits on commas outside quotes. The base64 of the filters is written
   here (no crate).

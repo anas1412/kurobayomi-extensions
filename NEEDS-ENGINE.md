@@ -1,25 +1,5 @@
 # Features the recipes need from the engine
 
-## manga/gwtb
-
-Missing: a way to build a link out of a value that is not a link. Proposed: an optional `format` key on a value (after
-`regex`), where `{}` is replaced by the value: `url = { attr = "value", format = "/index.php?nro={}" }`.
-
-Why: the strips of Gone with the Blastwave are only listed as `<option value="93">#81 Knife Fight</option>` inside the
-"Jump to a strip" select. The strip address is `/index.php?nro=93` (the keiyoushi extension builds it the same way). The
-recipe can read `93` but not turn it into a link, so the engine joins it to the page and stores `/93`, which is a 404.
-No other element of the page links to the strips (only first and previous do).
-
-With `format` the chapters table of `manga/gwtb/recipe.toml` becomes `url = { attr = "value", format = "/index.php?nro={}" }`
-and nothing else changes. Checked: the page `https://www.blastwave-comic.com/index.php?nro=92` is a normal strip page
-(saved as `manga/gwtb/fixtures/chapter.html`), so the pages operation already works on it.
-
-## manga/existentialcomics
-
-Nothing missing. (Small workaround: the extension has the entry built in, the recipe reads it from the site's category
-archive page, because that is the only page that links to the by-date archive. A fixed-value option would make this
-simpler but is not needed.)
-
 ## anime/beatzanime
 
 Three things are missing. The first two stop playback; the third stops search.

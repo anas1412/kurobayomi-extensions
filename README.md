@@ -27,8 +27,6 @@ remove its link under **Repositories**; its sources go with it. A step-by-step g
 | | Source | Kind | Language | Type | Notes |
 |---|---|---|---|---|---|
 | <img src="sources/weebcentral/icon.png" width="24"> | Weeb Central | manga | en | plug-in | filters, 2 s between requests |
-| <img src="sources/existentialcomics/icon.png" width="24"> | Existential Comics | manga | en | recipe | |
-| <img src="sources/gwtb/icon.png" width="24"> | Gone with the Blastwave | manga | en | recipe | |
 | <img src="sources/kickassanime/icon.png" width="24"> | KickAssAnime | anime | en | plug-in | HLS with subtitles and audio tracks; details with synopsis, genres and status |
 | <img src="sources/beatzanime/icon.png" width="24"> | BeatZ Anime | anime | es | recipe | browse, details and episodes; search and playback need engine work ([NEEDS-ENGINE.md](NEEDS-ENGINE.md)) |
 

@@ -26,6 +26,7 @@ remove its link under **Repositories**; its sources go with it. A step-by-step g
 
 | | Source | Kind | Language | Type | Notes |
 |---|---|---|---|---|---|
+| <img src="sources/mangadex/icon.png" width="24"> | MangaDex | manga | en | plug-in | popular (new and followed), latest, search, details, every English chapter; no filters, 350 ms between requests |
 | <img src="sources/weebcentral/icon.png" width="24"> | Weeb Central | manga | en | plug-in | filters, 2 s between requests |
 | <img src="sources/kickassanime/icon.png" width="24"> | KickAssAnime | anime | en | plug-in | HLS with subtitles and audio tracks; details with synopsis, genres and status |
 | <img src="sources/animepahe/icon.png" width="24"> | AnimePahe | anime | en | plug-in | the airing list, search, details, episodes and HLS in 360p to 1080p; needs an app that passes Cloudflare's check |

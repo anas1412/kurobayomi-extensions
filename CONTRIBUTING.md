@@ -31,10 +31,14 @@ sources/<id>/         one folder per source; <id> is lower-case letters, digits,
   Cargo.toml, src/    the plug-in crate (standalone, not in a workspace)
   fixtures/           saved pages and responses the tests read
   icon.png            the site's icon, square PNG
+  health.toml         the page the health check fetches to see the site is up (url, expect, cloudflare)
   README.md           what it does, what was left out, the original extension
 parked/<id>/          sources kept but not offered; never read by the tools
 template/             starter crate for a new plug-in
-status.toml           which sources are blocked or broken
+status.toml           sources marked blocked or broken by hand (overrides health.toml)
+health.toml           written by tools/check-health.py: sources found broken (do not edit)
+health-state.json     the failures in a row per source, for the next check
+tools/check-health.py checks every source's site; a scheduled workflow runs it and rebuilds the index
 tools/build.sh        builds every plug-in into dist/
 tools/make-index.py   copies recipes and icons into dist/ and writes index.min.json
 dist/, index.min.json generated, but committed: the app downloads from them
@@ -110,6 +114,12 @@ example = "broken"    # the source needs a fix (red dot)
 ```
 
 Remove the line once it works again.
+
+A scheduled workflow (`.github/workflows/health.yml`, every 6 hours) also checks each site by itself with
+`tools/check-health.py` and marks a source broken after two failed checks in a row, active again at the next good one.
+Cloudflare's browser check counts as "unknown", not as down: the app passes it, this runner cannot. Give a new source a
+`health.toml` (`url`, `expect`, and `cloudflare = true` when the site has that check). The rules are tested with
+`python3 tools/test-check-health.py`.
 
 ## Build the index
 

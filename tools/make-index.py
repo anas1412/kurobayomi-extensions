@@ -70,8 +70,12 @@ def build_index(root, base_url):
     dist = root / "dist"
     sources = root / "sources"
     entries = []
-    status_file = root / "status.toml"
-    statuses = tomllib.loads(status_file.read_text(encoding="utf-8")) if status_file.is_file() else {}
+    # the status of each source: what tools/check-health.py found (health.toml), overridden by hand in status.toml
+    def read_statuses(name):
+        file = root / name
+        return tomllib.loads(file.read_text(encoding="utf-8")) if file.is_file() else {}
+    manual = read_statuses("status.toml")
+    statuses = {**read_statuses("health.toml"), **manual}
     for folder in sorted(sources.iterdir()) if sources.is_dir() else []:
         if not folder.is_dir():
             continue
@@ -144,8 +148,9 @@ def build_index(root, base_url):
         if stale.is_file() and stale.name not in named:
             print(f"removing stale dist/{stale.name}", file=sys.stderr)
             stale.unlink()
-    if statuses:
-        fail(f"status.toml: no source folder for {', '.join(sorted(statuses))}")
+    unknown = sorted(set(manual) & set(statuses))
+    if unknown:
+        fail(f"status.toml: no source folder for {', '.join(unknown)}")
     return {"version": 1, "name": "Kurobayomi Extensions Repository", "website": "https://github.com/anas1412/kurobayomi-extensions", "sources": entries}
 
 

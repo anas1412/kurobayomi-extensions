@@ -1,0 +1,30 @@
+{
+ "animepahe": {
+  "fails": 0,
+  "status": "active"
+ },
+ "beatzanime": {
+  "fails": 0,
+  "status": "active"
+ },
+ "kickassanime": {
+  "fails": 0,
+  "status": "active"
+ },
+ "mangadex": {
+  "fails": 0,
+  "status": "active"
+ },
+ "mangakakalot": {
+  "fails": 0,
+  "status": "active"
+ },
+ "mangapill": {
+  "fails": 0,
+  "status": "active"
+ },
+ "weebcentral": {
+  "fails": 0,
+  "status": "active"
+ }
+}

@@ -1,0 +1,4 @@
+# What tools/check-health.py fetches to see that the site is up.
+url = "https://www.mangakakalot.gg/manga-list/hot-manga"
+expect = "MangaKakalot"
+cloudflare = true  # the site answers plain clients with Cloudflare's browser check, which the app passes

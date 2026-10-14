@@ -1,0 +1,8 @@
+id = "mangakakalot"
+name = "Mangakakalot"
+lang = "en"
+kind = "manga"
+version = 1
+# The only host the plug-in may reach through the `http` import. Covers and page images (a CDN host) load in the app.
+# The site is behind Cloudflare's browser check, which the app passes (hidden pages).
+hosts = ["www.mangakakalot.gg"]

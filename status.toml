@@ -1,3 +1,2 @@
 # The state of each source, shown in the app as a coloured dot on its Browse row. A source not listed here is active
 # (green). "blocked": the site refuses the app for now (orange). "broken": the source needs a fix (red).
-beatzanime = "broken"

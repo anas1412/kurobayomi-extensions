@@ -28,6 +28,7 @@ remove its link under **Repositories**; its sources go with it. A step-by-step g
 |---|---|---|---|---|---|
 | <img src="sources/weebcentral/icon.png" width="24"> | Weeb Central | manga | en | plug-in | filters, 2 s between requests |
 | <img src="sources/kickassanime/icon.png" width="24"> | KickAssAnime | anime | en | plug-in | HLS with subtitles and audio tracks; details with synopsis, genres and status |
+| <img src="sources/animepahe/icon.png" width="24"> | AnimePahe | anime | en | plug-in | the airing list, search, details, episodes and HLS in 360p to 1080p; needs an app that passes Cloudflare's check |
 | <img src="sources/beatzanime/icon.png" width="24"> | BeatZ Anime | anime | es | recipe | browse, details and episodes; search and playback need engine work ([NEEDS-ENGINE.md](NEEDS-ENGINE.md)) |
 
 Not offered (in `parked/`):
@@ -35,7 +36,6 @@ Not offered (in `parked/`):
 | Source | Why |
 |---|---|
 | Comix | the site retired the keys its API requests are signed with; it comes back when they are re-captured (`parked/comix/capture.js`) |
-| AnimePahe | the site's Cloudflare challenge cannot be passed by a sandboxed plug-in |
 | KimoiTV | the site's Cloudflare Turnstile check blocks playback |
 
 ## How a source works

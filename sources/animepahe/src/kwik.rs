@@ -25,9 +25,10 @@
 //! OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //! SOFTWARE.
 
-use regex::Regex;
+use regex_lite::Regex;
 use std::collections::HashMap;
 
+#[allow(dead_code)] // the pahe.win MP4 path: kept for downloads, not used for streaming (HLS)
 /// The first `("payload",n,"key",v1,v2,n)` call of a Kwik page. `v2` is both the radix and the index of the separator in `key`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Params {
@@ -37,6 +38,7 @@ pub struct Params {
     pub v2: i32,
 }
 
+#[allow(dead_code)] // the pahe.win MP4 path: kept for downloads, not used for streaming (HLS)
 pub fn find_params(html: &str) -> Option<Params> {
     let re = Regex::new(r#"\("([A-Za-z0-9_]+)",[0-9]+,"([A-Za-z0-9_]+)",([0-9]+),([0-9]+),[0-9]+\)"#).unwrap();
     let c = re.captures(html)?;
@@ -48,6 +50,7 @@ pub fn find_params(html: &str) -> Option<Params> {
     })
 }
 
+#[allow(dead_code)] // the pahe.win MP4 path: kept for downloads, not used for streaming (HLS)
 /// The key routine. `payload` is cut at each character `key[v2]`; each piece is the key indices of one character, written
 /// in radix `v2`, minus `v1`. Stops at the first piece that does not parse, as the reference does.
 /// None when `key[v2]` does not exist (the reference throws there).
@@ -78,6 +81,7 @@ pub fn decrypt(payload: &str, key: &str, v1: i32, v2: i32) -> Option<String> {
     Some(String::from_utf16_lossy(&out))
 }
 
+#[allow(dead_code)] // the pahe.win MP4 path: kept for downloads, not used for streaming (HLS)
 /// The `action` URL and the `_token` value of the decrypted Kwik form. None if either is missing.
 pub fn form_fields(decrypted: &str) -> Option<(String, String)> {
     let action = Regex::new(r#"action="([^"]+)""#).unwrap();
@@ -85,6 +89,7 @@ pub fn form_fields(decrypted: &str) -> Option<(String, String)> {
     Some((action.captures(decrypted)?[1].to_string(), token.captures(decrypted)?[1].to_string()))
 }
 
+#[allow(dead_code)] // the pahe.win MP4 path: kept for downloads, not used for streaming (HLS)
 /// The Kwik URL from the `location` header of a pahe `/i` redirect: `https://` plus the text after the last `https://`.
 pub fn kwik_url_from_location(location: &str) -> String {
     let tail = location.rsplit_once("https://").map_or(location, |(_, t)| t);

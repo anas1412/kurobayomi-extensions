@@ -21,6 +21,7 @@ pub struct LatestAnimeDto {
     pub title: String,
     pub snapshot: String,
     #[serde(default)]
+    #[allow(dead_code)] // the airing list's fansub: not shown
     pub fansub: Option<String>,
 }
 
@@ -38,6 +39,7 @@ pub struct EpisodeDto {
     pub session: String,
     #[serde(rename = "episode")]
     pub episode_number: f32,
+    #[allow(dead_code)] // the episode's anime: the plug-in already knows it
     pub anime_id: i64,
 }
 

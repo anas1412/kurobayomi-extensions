@@ -4,7 +4,7 @@
 //! that upstream's licence was not checked.
 //! Like the reference, the payload is not JS-unescaped: `\'` stays `\'`.
 
-use regex::{Captures, Regex};
+use regex_lite::{Captures, Regex};
 
 const ALPHABET_52: &str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP";
 const ALPHABET_54: &str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQR";

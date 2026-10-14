@@ -1,16 +1,26 @@
 [package]
-name = "kurobayomi-source-animepahe"
+name = "kuro-source-animepahe"
 version = "0.1.0"
 edition = "2024"
 publish = false
-description = "BLOCKED: pure logic of the AnimePahe source (Kwik decode, JSON shapes). No network."
 
 # A standalone crate: not part of any workspace, so it builds on its own.
 [workspace]
 
-[dependencies]
-regex = "1.13"
-serde = { version = "1", features = ["derive"] }
+[lib]
+crate-type = ["cdylib"]
 
-[dev-dependencies]
+[dependencies]
+regex-lite = "0.1"
+scraper = "0.27"
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+url = "2"
+wit-bindgen = "0.57"
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+codegen-units = 1
+panic = "abort"

@@ -41,6 +41,7 @@ means the source is broken and needs a fix.
 |---|---|---|
 | <img src="sources/kickassanime/icon.png" width="24" height="24" align="center"> KickAssAnime | en | streaming with subtitles and audio tracks |
 | <img src="sources/animepahe/icon.png" width="24" height="24" align="center"> AnimePahe | en | airing list, search, streaming in 360p to 1080p |
+| <img src="sources/beatzanime/icon.png" width="24" height="24" align="center"> BeatZ Anime | es | browse, details and episodes |
 
 Mangakakalot and AnimePahe sit behind Cloudflare's browser check, so they need a recent Kurobayomi that can pass it.
 

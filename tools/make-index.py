@@ -28,6 +28,8 @@ KINDS = ("manga", "anime")
 LIMIT_PER_KIND = 10
 MAX_FILE_BYTES = 1024 * 1024  # the app refuses a larger file
 ID_PATTERN = re.compile(r"[a-z0-9._-]+")
+# status.toml: `<id> = "blocked"` or `"broken"`; a source not listed there is active. The app shows it as a coloured dot.
+STATUSES = ("active", "blocked", "broken")
 
 
 def fail(message):
@@ -68,6 +70,8 @@ def build_index(root, base_url):
     dist = root / "dist"
     sources = root / "sources"
     entries = []
+    status_file = root / "status.toml"
+    statuses = tomllib.loads(status_file.read_text(encoding="utf-8")) if status_file.is_file() else {}
     for folder in sorted(sources.iterdir()) if sources.is_dir() else []:
         if not folder.is_dir():
             continue
@@ -116,6 +120,11 @@ def build_index(root, base_url):
             "sha256": hashlib.sha256(data).hexdigest(),
             "type": kind_type,
         })
+        status = statuses.pop(folder.name, "active")
+        if status not in STATUSES:
+            fail(f"status.toml: {folder.name} must be one of {', '.join(STATUSES)}, not {status!r}")
+        if status != "active":
+            entries[-1]["status"] = status
         if kind_type == "wasm":
             entries[-1]["hosts"] = hosts
         # the site's icon (sources/<id>/icon.png, a square PNG), shown in the app's source lists
@@ -135,7 +144,9 @@ def build_index(root, base_url):
         if stale.is_file() and stale.name not in named:
             print(f"removing stale dist/{stale.name}", file=sys.stderr)
             stale.unlink()
-    return {"version": 1, "sources": entries}
+    if statuses:
+        fail(f"status.toml: no source folder for {', '.join(sorted(statuses))}")
+    return {"version": 1, "name": "Kurobayomi Extensions Repository", "website": "https://github.com/anas1412/kurobayomi-extensions", "sources": entries}
 
 
 def main():

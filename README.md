@@ -26,15 +26,15 @@ guide walks through this with screenshots.
 Each source row in the app has a coloured dot: green works, orange means the site is blocking the app for now, red
 means the source is broken and needs a fix.
 
-| | Source | Kind | Language | What works |
-|---|---|---|---|---|
-| <img src="sources/mangadex/icon.png" width="24"> | MangaDex | manga | en | popular, latest, search, every English chapter |
-| <img src="sources/mangapill/icon.png" width="24"> | MangaPill | manga | en | trending, latest, search, chapters (no dates) |
-| <img src="sources/mangakakalot/icon.png" width="24"> | Mangakakalot | manga | en | hot, latest, search, chapters with dates |
-| <img src="sources/weebcentral/icon.png" width="24"> | Weeb Central | manga | en | popular, latest, search with filters, chapters |
-| <img src="sources/kickassanime/icon.png" width="24"> | KickAssAnime | anime | en | streaming with subtitles and audio tracks |
-| <img src="sources/animepahe/icon.png" width="24"> | AnimePahe | anime | en | airing list, search, streaming in 360p to 1080p |
-| <img src="sources/beatzanime/icon.png" width="24"> | BeatZ Anime | anime | es | 🔴 browsing only: search and playback need app support ([NEEDS-ENGINE.md](NEEDS-ENGINE.md)) |
+| Source | Kind | Language | What works |
+|---|---|---|---|
+| <img src="sources/mangadex/icon.png" width="24" height="24" align="center"> MangaDex | manga | en | popular, latest, search, every English chapter |
+| <img src="sources/mangapill/icon.png" width="24" height="24" align="center"> MangaPill | manga | en | trending, latest, search, chapters (no dates) |
+| <img src="sources/mangakakalot/icon.png" width="24" height="24" align="center"> Mangakakalot | manga | en | hot, latest, search, chapters with dates |
+| <img src="sources/weebcentral/icon.png" width="24" height="24" align="center"> Weeb Central | manga | en | popular, latest, search with filters, chapters |
+| <img src="sources/kickassanime/icon.png" width="24" height="24" align="center"> KickAssAnime | anime | en | streaming with subtitles and audio tracks |
+| <img src="sources/animepahe/icon.png" width="24" height="24" align="center"> AnimePahe | anime | en | airing list, search, streaming in 360p to 1080p |
+| <img src="sources/beatzanime/icon.png" width="24" height="24" align="center"> BeatZ Anime | anime | es | 🔴 browsing only: search and playback need app support ([NEEDS-ENGINE.md](NEEDS-ENGINE.md)) |
 
 Mangakakalot and AnimePahe sit behind Cloudflare's browser check, so they need a recent Kurobayomi that can pass it.
 

@@ -94,6 +94,10 @@ fn poster_key(id: i64) -> String {
     format!("poster_{id}")
 }
 
+fn title_key(id: i64) -> String {
+    format!("title_{id}")
+}
+
 fn cached_poster(id: i64) -> Option<String> {
     serde_json::from_str(&host::pref_get(&poster_key(id))).ok().filter(|p: &String| !p.is_empty())
 }
@@ -198,37 +202,44 @@ fn descriptor() -> serde_json::Value {
 }
 
 /// The airing list: the site has no popular list, and the Kotlin shows this one.
-/// How many posters one list may look up by title. Each is one request, spaced by the site's gap, and the person waits at
-/// most 30 s for a list, so the rest come on the next load (every poster found is kept).
-const POSTER_LOOKUPS: usize = 5;
+/// The marker a list gives as an anime's picture while its poster is unknown: the app asks the `cover` op for the real one
+/// when the card is on screen, so a list never waits on lookups.
+const COVER_MARKER: &str = "kb-cover:";
 
 /// The airing list carries a screenshot of the latest episode, not the anime's poster (the Kotlin shows the screenshot too).
-/// A poster seen before (a search, a details page, an earlier lookup) replaces the screenshot, and a few missing ones are
-/// looked up by title, so the list fills with posters over the first loads.
+/// A poster seen before (a search, a details page, an earlier lookup) replaces it; the others carry the marker.
 fn popular(input: &str) -> Res<AnimesPage> {
     let page = args::<PageArgs>(input)?.page;
     let (mut list, sessions) = api::parse_airing(&get(&api::airing_url(page))?)?;
     remember(&sessions);
-    let mut lookups = POSTER_LOOKUPS;
     for anime in &mut list.animes {
-        let Some(id) = api::id_of(&anime.url) else { continue };
-        if let Some(poster) = cached_poster(id) {
-            anime.thumbnail_url = Some(poster);
-        } else if lookups > 0 {
-            lookups -= 1;
-            let found = get(&api::search_url(&api::query_of(&anime.title), 1, unix_seconds())).and_then(|body| api::search_hits(&body));
-            match found {
-                Ok(hits) => {
-                    remember_posters(&hits);
-                    if let Some(hit) = hits.iter().find(|hit| hit.id == id) {
-                        anime.thumbnail_url = Some(hit.poster.clone());
-                    }
+        let id = api::id_of(&anime.url);
+        anime.thumbnail_url = Some(match id.and_then(cached_poster) {
+            Some(poster) => poster,
+            None => {
+                // the cover op gets only the url, and finds the poster by the title kept here
+                if let Some(id) = id {
+                    let _ = host::pref_set(&title_key(id), &json!(anime.title).to_string());
                 }
-                Err(error) => host::log(2, &format!("animepahe: no poster for {}: {error}", anime.title)),
+                format!("{COVER_MARKER}{}", anime.url)
             }
-        }
+        });
     }
     Ok(list)
+}
+
+/// The poster of one anime: the remembered one, else found by searching its title.
+fn cover(input: &str) -> Res<Option<String>> {
+    let anime = args::<AnimeArgs>(input)?.anime;
+    let Some(id) = api::id_of(&anime.url) else { return Ok(None) };
+    if let Some(poster) = cached_poster(id) {
+        return Ok(Some(poster));
+    }
+    let title = Some(anime.title).filter(|t| !t.is_empty()).or_else(|| serde_json::from_str(&host::pref_get(&title_key(id))).ok());
+    let Some(title) = title else { return Ok(None) };
+    let hits = api::search_hits(&get(&api::search_url(&api::query_of(&title), 1, unix_seconds()))?)?;
+    remember_posters(&hits);
+    Ok(hits.iter().find(|hit| hit.id == id).map(|hit| hit.poster.clone()))
 }
 
 fn search(input: &str) -> Res<AnimesPage> {
@@ -317,6 +328,7 @@ impl Guest for Plugin {
             "popular" => json_out(popular(&input_json)),
             "search" => json_out(search(&input_json)),
             "details" => json_out(details(&input_json)),
+            "cover" => json_out(cover(&input_json)),
             "episodes" => json_out(episodes(&input_json)),
             "hosters" => json_out(hosters(&input_json)),
             "videos" => json_out(videos(&input_json)),

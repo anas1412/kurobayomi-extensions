@@ -13,7 +13,8 @@ source.
 | Op | Request |
 |---|---|
 | `info`, `create-sources` | the descriptor, id `9163675745699695675` (`MD5("animepahe/en/1")`, the Kotlin id); no Latest; 1.5 s between requests |
-| `popular` | `GET /api?m=airing&page=N` (the site has no popular list; the Kotlin shows this one) |
+| `popular` | `GET /api?m=airing&page=N` (the site has no popular list; the Kotlin shows this one). The list carries a screenshot, not a poster: a remembered poster replaces it, else the thumbnail is `kb-cover:/a/{id}` and the app asks `cover` when the card shows |
+| `cover` | the poster of one anime: the remembered one, else found by searching its title (kept by `popular`) and matching the id |
 | `search` | `GET /api?m=search&q=<text> <stamp>&page=N` (the stamp gets past the site's cache; the search ignores it). No text: the airing list |
 | `details` | `GET /anime/{session}`: title, poster, summary, genres, status, studio |
 | `episodes` | every page of `GET /api?m=release&id={session}&sort=episode_asc&page=N`, newest first |

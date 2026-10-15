@@ -143,10 +143,25 @@ pub fn parse_search(body: &str) -> Res<(AnimesPage, Vec<(i64, String)>)> {
     Ok((AnimesPage { animes, has_next_page: page.current_page < page.last_page }, sessions))
 }
 
-/// The search results as `(id, title, session)`, for finding an anime's session again.
-pub fn search_hits(body: &str) -> Res<Vec<(i64, String, String)>> {
+/// One result of a search: the anime's id, title, current session and poster.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Hit {
+    pub id: i64,
+    pub title: String,
+    pub session: String,
+    pub poster: String,
+}
+
+/// The search results, for finding an anime's session again and its poster.
+pub fn search_hits(body: &str) -> Res<Vec<Hit>> {
     let page: ResponseDto<SearchResultDto> = decode(body)?;
-    Ok(page.items.into_iter().map(|a| (a.id, a.title, a.session)).collect())
+    Ok(page.items.into_iter().map(|a| Hit { id: a.id, title: a.title, session: a.session, poster: a.poster }).collect())
+}
+
+/// The title as a search query: letters, digits and spaces only (the site's search drops the rest).
+pub fn query_of(title: &str) -> String {
+    let q: String = title.chars().map(|c| if c.is_alphanumeric() || c.is_whitespace() { c } else { ' ' }).collect();
+    q.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 fn sel(css: &str) -> Selector {
@@ -320,7 +335,10 @@ mod tests {
         assert_eq!(page.animes[0].title, "Frieren: Beyond Journey's End");
         assert!(page.animes[0].thumbnail_url.as_deref().unwrap().contains("/posters/"));
         assert!(!page.has_next_page);
-        assert_eq!(search_hits(SEARCH).unwrap()[0].0, 5319);
+        let hits = search_hits(SEARCH).unwrap();
+        assert_eq!(hits[0].id, 5319);
+        assert!(hits[0].poster.contains("/posters/"));
+        assert_eq!(query_of("Frieren: Beyond Journey's End!"), "Frieren Beyond Journey s End");
     }
 
     #[test]

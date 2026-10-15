@@ -90,15 +90,31 @@ fn unix_seconds() -> u64 {
     host::unix_seconds()
 }
 
+fn poster_key(id: i64) -> String {
+    format!("poster_{id}")
+}
+
+fn cached_poster(id: i64) -> Option<String> {
+    serde_json::from_str(&host::pref_get(&poster_key(id))).ok().filter(|p: &String| !p.is_empty())
+}
+
+fn remember_posters(hits: &[api::Hit]) {
+    for hit in hits {
+        if cached_poster(hit.id).as_deref() != Some(hit.poster.as_str()) {
+            let _ = host::pref_set(&poster_key(hit.id), &json!(hit.poster).to_string());
+        }
+    }
+}
+
 /// Finds an anime's current session by searching its title and matching its id (Kotlin `fetchSessionAndId`).
 fn find_session(id: i64, title: &str) -> Res<String> {
-    let query: String = title.chars().map(|c| if c.is_alphanumeric() || c.is_whitespace() { c } else { ' ' }).collect();
-    let query = query.split_whitespace().collect::<Vec<_>>().join(" ");
+    let query = api::query_of(title);
     for page in 1..=3 {
         let hits = api::search_hits(&get(&api::search_url(&query, page, unix_seconds()))?)?;
-        if let Some((_, _, session)) = hits.iter().find(|(hit, ..)| *hit == id) {
-            remember(&[(id, session.clone())]);
-            return Ok(session.clone());
+        remember_posters(&hits);
+        if let Some(hit) = hits.iter().find(|hit| hit.id == id) {
+            remember(&[(id, hit.session.clone())]);
+            return Ok(hit.session.clone());
         }
         if hits.is_empty() {
             break;
@@ -182,10 +198,36 @@ fn descriptor() -> serde_json::Value {
 }
 
 /// The airing list: the site has no popular list, and the Kotlin shows this one.
+/// How many posters one list may look up by title. Each is one request, spaced by the site's gap, and the person waits at
+/// most 30 s for a list, so the rest come on the next load (every poster found is kept).
+const POSTER_LOOKUPS: usize = 5;
+
+/// The airing list carries a screenshot of the latest episode, not the anime's poster (the Kotlin shows the screenshot too).
+/// A poster seen before (a search, a details page, an earlier lookup) replaces the screenshot, and a few missing ones are
+/// looked up by title, so the list fills with posters over the first loads.
 fn popular(input: &str) -> Res<AnimesPage> {
     let page = args::<PageArgs>(input)?.page;
-    let (list, sessions) = api::parse_airing(&get(&api::airing_url(page))?)?;
+    let (mut list, sessions) = api::parse_airing(&get(&api::airing_url(page))?)?;
     remember(&sessions);
+    let mut lookups = POSTER_LOOKUPS;
+    for anime in &mut list.animes {
+        let Some(id) = api::id_of(&anime.url) else { continue };
+        if let Some(poster) = cached_poster(id) {
+            anime.thumbnail_url = Some(poster);
+        } else if lookups > 0 {
+            lookups -= 1;
+            let found = get(&api::search_url(&api::query_of(&anime.title), 1, unix_seconds())).and_then(|body| api::search_hits(&body));
+            match found {
+                Ok(hits) => {
+                    remember_posters(&hits);
+                    if let Some(hit) = hits.iter().find(|hit| hit.id == id) {
+                        anime.thumbnail_url = Some(hit.poster.clone());
+                    }
+                }
+                Err(error) => host::log(2, &format!("animepahe: no poster for {}: {error}", anime.title)),
+            }
+        }
+    }
     Ok(list)
 }
 
@@ -194,8 +236,10 @@ fn search(input: &str) -> Res<AnimesPage> {
     if a.query.trim().is_empty() {
         return popular(&json!({ "args": { "page": a.page } }).to_string());
     }
-    let (list, sessions) = api::parse_search(&get(&api::search_url(a.query.trim(), a.page, unix_seconds()))?)?;
+    let body = get(&api::search_url(a.query.trim(), a.page, unix_seconds()))?;
+    let (list, sessions) = api::parse_search(&body)?;
     remember(&sessions);
+    remember_posters(&api::search_hits(&body)?);
     Ok(list)
 }
 

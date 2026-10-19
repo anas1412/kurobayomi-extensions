@@ -43,6 +43,7 @@ means the source is broken and needs a fix.
 | <img src="sources/kickassanime/icon.png" width="24" height="24" align="center"> KickAssAnime | en | streaming with subtitles and audio tracks |
 | <img src="sources/animepahe/icon.png" width="24" height="24" align="center"> AnimePahe | en | airing list, search, streaming in 360p to 1080p |
 | <img src="sources/animeparadise/icon.png" width="24" height="24" align="center"> AnimeParadise | en | popular, latest, search, 1080p streaming with subtitles in many languages |
+| <img src="sources/animegg/icon.png" width="24" height="24" align="center"> AnimeGG | en | popular, latest, search, subbed, dubbed and raw MP4 streams |
 
 Mangakakalot and AnimePahe sit behind Cloudflare's browser check, so they need a recent Kurobayomi that can pass it.
 

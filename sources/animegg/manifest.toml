@@ -1,0 +1,8 @@
+id = "animegg"
+name = "AnimeGG"
+lang = "en"
+kind = "anime"
+version = 1
+# The only host the plug-in reaches through the `http` import: the site, its pages and its player pages. The videos (which
+# redirect to vidcache.net) and the posters load in the app, not here.
+hosts = ["www.animegg.org"]

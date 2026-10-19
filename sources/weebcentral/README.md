@@ -16,6 +16,9 @@ Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
 - Search filters (ABI 1.5 `filters`), read by their Kotlin names: Sort, Sort Order, Official Translation, Anime
   Adaptation, Adult Content, Author (Case-sensitive), Series Status, Series Type and Tags (include and exclude). An
   absent filter takes its Kotlin default. The app holds no filters today, so a search sends the defaults.
+- Adult titles follow the app's **Show adult (18+) titles** switch (Settings, NSFW group, off by default; `showAdult` in
+  the envelope): while it is off every list sends `adult=False`, whatever the Adult Content filter says. The site's
+  Adult tag also covers mature series (Berserk, Oyasumi Punpun), so those are hidden too.
 - Request headers (ABI 1.5 `request-headers`): `Accept: image/avif,image/webp,*/*`, and no Origin, as the Kotlin
   `imageRequest` sends.
 - Spacing (ABI 1.5 `requestGapMs`): 2000 ms between two requests to the site, as the Kotlin `rateLimit(1, 2.seconds)`.

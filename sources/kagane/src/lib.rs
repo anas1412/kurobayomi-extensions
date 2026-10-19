@@ -43,9 +43,13 @@ struct Ref {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Envelope {
     #[serde(default)]
     args: Args,
+    /// The app's "Show adult (18+) titles" switch. An app that does not send it hides them.
+    #[serde(default)]
+    show_adult: bool,
 }
 
 #[derive(Deserialize)]
@@ -89,9 +93,9 @@ fn to_value<T: serde::Serialize>(value: T) -> Res<Value> {
     serde_json::to_value(value).map_err(|e| e.to_string())
 }
 
-/// The list sorted by `sort` (empty: relevance), filtered by `query`.
-fn list(page: i32, query: &str, sort: &str) -> Res<Value> {
-    to_value(api::parse_search(&send("POST", &api::search_url(page, sort), Some(&api::search_body(query)), &[])?)?)
+/// The list sorted by `sort` (empty: relevance), filtered by `query`; adult titles only when `show_adult`.
+fn list(page: i32, query: &str, sort: &str, show_adult: bool) -> Res<Value> {
+    to_value(api::parse_search(&send("POST", &api::search_url(page, sort), Some(&api::search_body(query, show_adult)), &[])?)?)
 }
 
 /// The integrity token the page challenge needs: the kept one while it has time left, else a new one, kept for the next
@@ -119,12 +123,12 @@ fn pages(chapter_url: &str) -> Res<Value> {
     to_value(images.into_iter().map(|image| json!({ "url": "", "imageUrl": image })).collect::<Vec<_>>())
 }
 
-fn run(op: &str, args: Args) -> Res<Value> {
+fn run(op: &str, args: Args, show_adult: bool) -> Res<Value> {
     match op {
         // the Kotlin's Popular is "Popular (Total Views)", its Latest "Latest" (`updated_at`)
-        "popular" => list(args.page, "", "total_views"),
-        "latest" => list(args.page, "", "updated_at"),
-        "search" => list(args.page, &args.query, ""),
+        "popular" => list(args.page, "", "total_views", show_adult),
+        "latest" => list(args.page, "", "updated_at", show_adult),
+        "search" => list(args.page, &args.query, "", show_adult),
         "details" => {
             let manga = args.manga.ok_or("details needs args.manga")?;
             to_value(api::parse_details(&manga.url, &send("GET", &api::details_url(&manga.url), None, &[])?)?)
@@ -149,7 +153,7 @@ impl Guest for Plugin {
             "request-headers" => json!([["Accept", "image/jxl,image/avif,image/webp,image/*,*/*"], ["Referer", format!("{}/", api::BASE)]]),
             "popular" | "latest" | "search" | "details" | "chapters" | "pages" => {
                 let envelope: Envelope = serde_json::from_str(&input_json).map_err(|e| format!("invalid input: {e}"))?;
-                run(&op, envelope.args)?
+                run(&op, envelope.args, envelope.show_adult)?
             }
             _ => return Err(format!("unknown op: {op}")),
         };

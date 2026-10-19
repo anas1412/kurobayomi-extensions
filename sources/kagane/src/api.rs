@@ -78,16 +78,16 @@ pub fn search_url(page: i32, sort: &str) -> String {
     url
 }
 
-/// The search body: every source type and English titles. Only safe and suggestive (15+) titles, as the MangaDex source
-/// shows: the Kotlin's "suggestive" content rating, which also sends `is_pornographic: false` (the site has no
-/// pornographic age rating of its own).
-pub fn search_body(query: &str) -> String {
-    let mut body = json!({
-        "source_type": ["Official", "Unofficial", "Mixed"],
-        "content_lang": ["en"],
-        "age_rating": ["Safe", "FifteenPlus"],
-        "is_pornographic": false,
-    });
+/// The search body: every source type and English titles. Unless the user shows adult titles (the app's `showAdult`),
+/// only safe and suggestive (15+) ones: the Kotlin's "suggestive" content rating, which also sends `is_pornographic:
+/// false` (the site has no pornographic age rating of its own). With adult titles shown, every rating, as the Kotlin
+/// defaults.
+pub fn search_body(query: &str, show_adult: bool) -> String {
+    let mut body = json!({ "source_type": ["Official", "Unofficial", "Mixed"], "content_lang": ["en"] });
+    if !show_adult {
+        body["age_rating"] = json!(["Safe", "FifteenPlus"]);
+        body["is_pornographic"] = json!(false);
+    }
     if !query.trim().is_empty() {
         body["title"] = json!(query.trim());
     }
@@ -406,12 +406,14 @@ mod tests {
 
     #[test]
     fn the_search_body_names_the_title_only_when_there_is_one() {
-        let body: Value = serde_json::from_str(&search_body(" one piece ")).unwrap();
+        let body: Value = serde_json::from_str(&search_body(" one piece ", false)).unwrap();
         assert_eq!(body["title"], "one piece");
         assert_eq!(body["content_lang"], json!(["en"]));
-        let empty: Value = serde_json::from_str(&search_body("  ")).unwrap();
+        let empty: Value = serde_json::from_str(&search_body("  ", false)).unwrap();
         assert!(empty.get("title").is_none());
         assert_eq!((empty["age_rating"].clone(), empty["is_pornographic"].clone()), (json!(["Safe", "FifteenPlus"]), json!(false)), "adult titles are left out");
+        let adult: Value = serde_json::from_str(&search_body("", true)).unwrap();
+        assert!(adult.get("age_rating").is_none() && adult.get("is_pornographic").is_none(), "every rating when the user shows adult titles");
     }
 
     #[test]

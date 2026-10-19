@@ -68,8 +68,9 @@ fn options(filters: &[Value], name: &str) -> Vec<(String, Value)> {
 
 /// `/search/data` for one page. `sort` is the sort of a listing ("Popularity", "Latest Updates"); `None` reads the
 /// "Sort" filter (default "Best Match"). The other filters are read by their Kotlin names, and an absent one takes
-/// its Kotlin default. The characters `!#:(),-` of the query become spaces, as the Kotlin does.
-pub fn listing_url(page_number: i32, query: &str, sort: Option<&str>, filters: &[Value]) -> Result<Url, String> {
+/// its Kotlin default. The characters `!#:(),-` of the query become spaces, as the Kotlin does. Unless the user shows
+/// adult titles (the app's `showAdult`), `adult=False` whatever the "Adult Content" filter says.
+pub fn listing_url(page_number: i32, query: &str, sort: Option<&str>, filters: &[Value], show_adult: bool) -> Result<Url, String> {
     let text = query.replace(|c: char| "!#:(),-".contains(c), " ");
     let sort = sort.map_or_else(|| picked(filters, "Sort", "Best Match"), str::to_owned);
     let offset = page_number.max(1).saturating_sub(1).saturating_mul(PAGE_SIZE);
@@ -79,7 +80,7 @@ pub fn listing_url(page_number: i32, query: &str, sort: Option<&str>, filters: &
         ("order".to_owned(), picked(filters, "Sort Order", "Descending")),
         ("official".to_owned(), picked(filters, "Official Translation", "Any")),
         ("anime".to_owned(), picked(filters, "Anime Adaptation", "Any")),
-        ("adult".to_owned(), picked(filters, "Adult Content", "Any")),
+        ("adult".to_owned(), if show_adult { picked(filters, "Adult Content", "Any") } else { "False".to_owned() }),
     ];
     let author = text_of(filters, "Author (Case-sensitive)");
     if !author.is_empty() {
@@ -472,18 +473,20 @@ mod tests {
 
     #[test]
     fn listing_urls_match_the_kotlin() {
-        let popular = listing_url(1, "", Some("Popularity"), &[]).unwrap();
+        let popular = listing_url(1, "", Some("Popularity"), &[], true).unwrap();
         assert_eq!(
             popular.as_str(),
             "https://weebcentral.com/search/data?text=&sort=Popularity&order=Descending&official=Any&anime=Any&adult=Any&limit=32&offset=0&display_mode=Full+Display"
         );
-        let latest = listing_url(3, "", Some("Latest Updates"), &[]).unwrap();
+        let latest = listing_url(3, "", Some("Latest Updates"), &[], true).unwrap();
         assert!(latest.as_str().contains("sort=Latest+Updates") && latest.as_str().contains("offset=64"), "{latest}");
-        let search = listing_url(1, "One Piece: Party (x)", None, &[]).unwrap();
+        let search = listing_url(1, "One Piece: Party (x)", None, &[], true).unwrap();
         assert!(
             search.as_str().starts_with("https://weebcentral.com/search/data?text=One+Piece++Party++x&sort=Best+Match&"),
             "{search}"
         );
+        let hidden = listing_url(1, "", Some("Popularity"), &[], false).unwrap();
+        assert!(hidden.as_str().contains("&adult=False&"), "adult titles are left out while the app hides them: {hidden}");
     }
 
     /// The app's FilterList (ABI 1.5) in the serde form: the Kotlin filter names, with the states a user picks.
@@ -505,7 +508,7 @@ mod tests {
             ]"#,
         )
         .unwrap();
-        let url = listing_url(2, "", None, &filters).unwrap();
+        let url = listing_url(2, "", None, &filters, true).unwrap();
         assert!(
             url.as_str().contains(
                 "sort=Popularity&order=Ascending&official=Any&anime=Any&adult=Any&author=Oda&included_status=Ongoing&included_type=Manhwa&included_tag=Action&excluded_tag=Adult&limit=32&offset=32"

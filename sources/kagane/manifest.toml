@@ -2,7 +2,7 @@ id = "kagane"
 name = "Kagane"
 lang = "en"
 kind = "manga"
-version = 2
+version = 3
 # The only host the plug-in reaches through the `http` import: the site and its API. Covers and page images (on the cache
 # host the API names, kstatic.to) load in the app, not here.
 hosts = ["kagane.si"]

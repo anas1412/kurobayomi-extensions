@@ -98,9 +98,13 @@ struct Args {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Envelope {
     #[serde(default)]
     args: Args,
+    /// The app's "Show adult (18+) titles" switch. An app that does not send it hides them.
+    #[serde(default)]
+    show_adult: bool,
 }
 
 /// The reply of the `http` import (`bridge.rs` in the app). `url` is the final address after redirects (ABI 1.5).
@@ -149,17 +153,17 @@ fn to_value<T: Serialize>(value: T) -> Result<Value, String> {
     serde_json::to_value(value).map_err(|e| e.to_string())
 }
 
-fn listing(page: i32, query: &str, sort: Option<&str>, filters: &[Value]) -> Result<Value, String> {
-    let url = site::listing_url(page, query, sort, filters)?;
+fn listing(page: i32, query: &str, sort: Option<&str>, filters: &[Value], show_adult: bool) -> Result<Value, String> {
+    let url = site::listing_url(page, query, sort, filters, show_adult)?;
     let (html, base) = get(&url)?;
     to_value(site::parse_listing(&html, &base)?)
 }
 
-fn run(op: &str, args: Args) -> Result<Value, String> {
+fn run(op: &str, args: Args, show_adult: bool) -> Result<Value, String> {
     match op {
-        "popular" => listing(args.page, "", Some("Popularity"), &[]),
-        "latest" => listing(args.page, "", Some("Latest Updates"), &[]),
-        "search" => listing(args.page, &args.query, None, &args.filters),
+        "popular" => listing(args.page, "", Some("Popularity"), &[], show_adult),
+        "latest" => listing(args.page, "", Some("Latest Updates"), &[], show_adult),
+        "search" => listing(args.page, &args.query, None, &args.filters, show_adult),
         "details" => {
             let manga = args.manga.ok_or("details needs args.manga")?;
             let url = site::page(&manga.url)?;
@@ -198,7 +202,7 @@ impl Guest for Plugin {
             "popular" | "latest" | "search" | "details" | "chapters" | "pages" => {
                 let envelope: Envelope =
                     serde_json::from_str(&input_json).map_err(|e| format!("invalid input: {e}"))?;
-                run(&op, envelope.args)?
+                run(&op, envelope.args, envelope.show_adult)?
             }
             _ => return Err(format!("unknown op: {op}")),
         };

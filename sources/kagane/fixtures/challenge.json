@@ -1,0 +1,32 @@
+{
+ "access_token": "ACCESS",
+ "cache_url": "https://kstatic.to",
+ "manifest": {
+  "pages": [
+   {
+    "ext": "jxl",
+    "height": 2250,
+    "page_id": "f2edc4fd-4921-50c1-a2e7-d6d7ba814dca",
+    "page_no": 1,
+    "width": 1500
+   },
+   {
+    "ext": "jxl",
+    "height": 2250,
+    "page_id": "529c867f-14e5-5380-b57c-7401dc02702e",
+    "page_no": 2,
+    "width": 1500
+   },
+   {
+    "ext": "jxl",
+    "height": 2250,
+    "page_id": "1720b177-6255-5cd8-bce3-3911cac04b5f",
+    "page_no": 3,
+    "width": 1500
+   }
+  ],
+  "version": 1
+ },
+ "view_token": "VIEW",
+ "view_token_expires_at": null
+}

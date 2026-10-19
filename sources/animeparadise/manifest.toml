@@ -1,0 +1,8 @@
+id = "animeparadise"
+name = "AnimeParadise"
+lang = "en"
+kind = "anime"
+version = 1
+# The only host the plug-in reaches through the `http` import: the API. Posters, the stream playlists
+# (stream.animeparadise.moe) and the subtitle files load in the app, not here.
+hosts = ["api.animeparadise.moe"]

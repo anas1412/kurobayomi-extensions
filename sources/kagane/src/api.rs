@@ -78,9 +78,16 @@ pub fn search_url(page: i32, sort: &str) -> String {
     url
 }
 
-/// The search body: every source type and English titles, as the Kotlin defaults (all content ratings).
+/// The search body: every source type and English titles. Only safe and suggestive (15+) titles, as the MangaDex source
+/// shows: the Kotlin's "suggestive" content rating, which also sends `is_pornographic: false` (the site has no
+/// pornographic age rating of its own).
 pub fn search_body(query: &str) -> String {
-    let mut body = json!({ "source_type": ["Official", "Unofficial", "Mixed"], "content_lang": ["en"] });
+    let mut body = json!({
+        "source_type": ["Official", "Unofficial", "Mixed"],
+        "content_lang": ["en"],
+        "age_rating": ["Safe", "FifteenPlus"],
+        "is_pornographic": false,
+    });
     if !query.trim().is_empty() {
         body["title"] = json!(query.trim());
     }
@@ -404,6 +411,7 @@ mod tests {
         assert_eq!(body["content_lang"], json!(["en"]));
         let empty: Value = serde_json::from_str(&search_body("  ")).unwrap();
         assert!(empty.get("title").is_none());
+        assert_eq!((empty["age_rating"].clone(), empty["is_pornographic"].clone()), (json!(["Safe", "FifteenPlus"]), json!(false)), "adult titles are left out");
     }
 
     #[test]

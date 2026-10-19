@@ -21,12 +21,14 @@ bytes, big-endian, with the top bit cleared: `4024736764982024684`.
 | `chapters` | `GET /api/v2/series/{id}/books/index?fields=List`, the compact index, highest sort number first; the groups are the scanlator |
 | `pages` | `POST /api/integrity` for the integrity token (kept until it runs out), then `POST /api/v2/books/{book}` with it: the cache host, the access token and the pages, as `{cache}/api/v2/books/page/{book}/{page}.{ext}?token=...` |
 
-Content shown: every content rating, from every source type (Official, Unofficial and Mixed), as the Kotlin defaults.
+Content shown: safe and suggestive (15+) titles only, as the MangaDex source, from every source type (Official,
+Unofficial and Mixed). Adult titles (18+ and pornographic) are left out: the Kotlin's "suggestive" content rating.
 Covers and page images load in the app, so the manifest lists only `kagane.si`.
 
 ## Not ported
 
-- The other 17 languages, the filters (genres, tags, sources, content rating, sort), the settings (content rating,
+- The other 17 languages, the filters (genres, tags, sources, content rating, sort), the settings (content rating, so
+  adult titles cannot be turned back on,
   excluded genres, official sources only, title cleaning, edition and source names in titles, chapter title mode, data
   saver), related titles, and the group tag the Kotlin reads out of a chapter's title.
 - The page token refresh: an access token runs out after a while, so a chapter left open a long time may need to be

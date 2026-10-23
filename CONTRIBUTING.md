@@ -6,8 +6,7 @@ and what a pull request needs.
 ## Before you start
 
 - **Bug reports:** open an issue with the source's name, what you did and what happened.
-- **New sources:** open an issue first. A repository can list at most 10 sources of each kind (manga, anime), so not
-  every site fits.
+- **New sources:** open an issue first, so two people do not port the same site.
 - **Ports only:** every source here is a port of an open-source Aniyomi, Mihon or keiyoushi extension under
   Apache-2.0. Name the original in the source's README. Do not copy code under another licence.
 

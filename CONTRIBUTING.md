@@ -117,7 +117,8 @@ Remove the line once it works again.
 A scheduled workflow (`.github/workflows/health.yml`, every 6 hours) also checks each site by itself with
 `tools/check-health.py` and marks a source broken after two failed checks in a row, active again at the next good one.
 Cloudflare's browser check counts as "unknown", not as down: the app passes it, this runner cannot. Give a new source a
-`health.toml` (`url`, `expect`, and `cloudflare = true` when the site has that check). The rules are tested with
+`health.toml` (`url`, `expect`, `cloudflare = true` when the site has that check, and `user_agent` when the site
+answers only the User-Agent the source sends). The rules are tested with
 `python3 tools/test-check-health.py`.
 
 ## Build the index

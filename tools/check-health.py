@@ -2,6 +2,7 @@
 """Checks that each source's site answers, and keeps health.toml (read by make-index.py) up to date.
 
 Each source folder may hold a health.toml:  url = "https://site/"  expect = "text the page has"  cloudflare = true
+(and user_agent = "..." for a site that answers only the User-Agent its source sends)
 The check fetches the url like a browser would and sorts the answer:
 - ok: HTTP 200 and the expected text is there.
 - challenge: Cloudflare's browser check answered (cf-mitigated: challenge). This runner cannot pass it, but the app does, so
@@ -48,8 +49,8 @@ def next_state(previous, result):
     return ("broken" if fails >= FAILS_TO_BREAK else status), fails
 
 
-def fetch(url):
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
+def fetch(url, user_agent=USER_AGENT):
+    request = urllib.request.Request(url, headers={"User-Agent": user_agent, "Accept": "*/*"})
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             return response.status, {k.lower(): v for k, v in response.headers.items()}, response.read(2_000_000).decode("utf-8", "replace")
@@ -72,7 +73,7 @@ def main():
         if not config.is_file():
             continue
         check = tomllib.loads(config.read_text(encoding="utf-8"))
-        status, headers, body = fetch(check["url"])
+        status, headers, body = fetch(check["url"], check.get("user_agent", USER_AGENT))
         result = classify(status, headers, body, check.get("expect", ""))
         if check.get("cloudflare") and result == "fail" and status in (403, 503):
             result = "challenge"  # a Cloudflare page this runner cannot read as one

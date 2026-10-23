@@ -35,6 +35,7 @@ means the source is broken and needs a fix.
 | <img src="sources/mangakakalot/icon.png" width="24" height="24" align="center"> Mangakakalot | en | hot, latest, search, chapters with dates |
 | <img src="sources/weebcentral/icon.png" width="24" height="24" align="center"> Weeb Central | en | popular, latest, search with filters, chapters |
 | <img src="sources/kagane/icon.png" width="24" height="24" align="center"> Kagane | en | popular, latest, search, chapters with dates and groups |
+| <img src="sources/usagi/icon.png" width="24" height="24" align="center"> Usagi | ru | popular, latest, search, chapters with dates and translators |
 
 ### Anime
 

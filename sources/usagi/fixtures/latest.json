@@ -1,0 +1,721 @@
+{
+  "total": 31254,
+  "limit": 50,
+  "offset": 0,
+  "list": [
+    {
+      "elementId": {
+        "linkName": "ia_zachichu_svoego_otca_tirana_",
+        "type": "MANGA",
+        "externalId": 31241,
+        "siteId": 12,
+        "fuid": "1:M:31241"
+      },
+      "category": {
+        "id": 3001,
+        "typeName": "category",
+        "name": "Манхва",
+        "picUrl": null
+      },
+      "name": "Я защищу своего отца-тирана!",
+      "picUrl": "https://rm.one-way.work/uploads/pics/02/51/046.webp",
+      "elements": [
+        {
+          "id": 9542,
+          "typeName": "tag",
+          "name": "Средневековье",
+          "picUrl": null
+        },
+        {
+          "id": 2119,
+          "typeName": "genre",
+          "name": "история",
+          "picUrl": null
+        },
+        {
+          "id": 2131,
+          "typeName": "genre",
+          "name": "фэнтези",
+          "picUrl": null
+        },
+        {
+          "id": 9480,
+          "typeName": "tag",
+          "name": "ГГ женщина",
+          "picUrl": null
+        },
+        {
+          "id": 9487,
+          "typeName": "tag",
+          "name": "Горничные",
+          "picUrl": null
+        },
+        {
+          "id": 2122,
+          "typeName": "genre",
+          "name": "сёдзё",
+          "picUrl": null
+        },
+        {
+          "id": 2130,
+          "typeName": "genre",
+          "name": "приключения",
+          "picUrl": null
+        },
+        {
+          "id": 7290,
+          "typeName": "another",
+          "name": "В цвете",
+          "picUrl": null
+        },
+        {
+          "id": 9568,
+          "typeName": "tag",
+          "name": "Дворянство",
+          "picUrl": null
+        },
+        {
+          "id": 2160,
+          "typeName": "another",
+          "name": "Веб",
+          "picUrl": null
+        },
+        {
+          "id": 9450,
+          "typeName": "genre",
+          "name": "исэкай",
+          "picUrl": null
+        },
+        {
+          "id": 9466,
+          "typeName": "tag",
+          "name": "Борьба за власть",
+          "picUrl": null
+        },
+        {
+          "id": 9599,
+          "typeName": "tag",
+          "name": "По мотивам романа",
+          "picUrl": null
+        }
+      ],
+      "lastUpdate": "2026-10-23T01:15:55Z",
+      "productionStatus": "FINISHED",
+      "translationStatus": "PROGRESS",
+      "forSale": false,
+      "saleStatus": "NONE",
+      "volumeCount": 1,
+      "chaptersCount": 63,
+      "rating": {
+        "voteCount": 58,
+        "rate": 9.13793
+      }
+    },
+    {
+      "elementId": {
+        "linkName": "you_re_a_cat__but_you_were_adopted_into_a_wolf_family",
+        "type": "MANGA",
+        "externalId": 30224,
+        "siteId": 12,
+        "fuid": "1:M:30224"
+      },
+      "category": {
+        "id": 3001,
+        "typeName": "category",
+        "name": "Манхва",
+        "picUrl": null
+      },
+      "name": "Я кошка, но меня приютила семья волков.",
+      "picUrl": "https://rm.one-way.work/uploads/pics/02/50/487.webp",
+      "elements": [
+        {
+          "id": 9495,
+          "typeName": "tag",
+          "name": "Зверолюди",
+          "picUrl": null
+        },
+        {
+          "id": 2122,
+          "typeName": "genre",
+          "name": "сёдзё",
+          "picUrl": null
+        },
+        {
+          "id": 9741,
+          "typeName": "tag",
+          "name": "Мать и дочь",
+          "picUrl": null
+        },
+        {
+          "id": 2130,
+          "typeName": "genre",
+          "name": "приключения",
+          "picUrl": null
+        },
+        {
+          "id": 9491,
+          "typeName": "tag",
+          "name": "Дружба",
+          "picUrl": null
+        },
+        {
+          "id": 9467,
+          "typeName": "tag",
+          "name": "Брат и сестра",
+          "picUrl": null
+        },
+        {
+          "id": 9634,
+          "typeName": "tag",
+          "name": "Отец и дочь",
+          "picUrl": null
+        },
+        {
+          "id": 9677,
+          "typeName": "tag",
+          "name": "Двойники/близнецы",
+          "picUrl": null
+        },
+        {
+          "id": 9654,
+          "typeName": "tag",
+          "name": "Люди с кошачьими ушами",
+          "picUrl": null
+        },
+        {
+          "id": 2118,
+          "typeName": "genre",
+          "name": "драма",
+          "picUrl": null
+        },
+        {
+          "id": 9599,
+          "typeName": "tag",
+          "name": "По мотивам романа",
+          "picUrl": null
+        },
+        {
+          "id": 9793,
+          "typeName": "year",
+          "name": "2024",
+          "picUrl": null
+        },
+        {
+          "id": 2131,
+          "typeName": "genre",
+          "name": "фэнтези",
+          "picUrl": null
+        },
+        {
+          "id": 9746,
+          "typeName": "tag",
+          "name": "ГГ не человек",
+          "picUrl": null
+        },
+        {
+          "id": 9480,
+          "typeName": "tag",
+          "name": "ГГ женщина",
+          "picUrl": null
+        },
+        {
+          "id": 9604,
+          "typeName": "tag",
+          "name": "Умерший член семьи",
+          "picUrl": null
+        },
+        {
+          "id": 2136,
+          "typeName": "genre",
+          "name": "комедия",
+          "picUrl": null
+        },
+        {
+          "id": 8430,
+          "typeName": "gournal",
+          "name": "Naver Webtoon",
+          "picUrl": "https://rm.one-way.work/uploads/pics/01/53/125.webp"
+        },
+        {
+          "id": 8046,
+          "typeName": "publisher",
+          "name": "Naver",
+          "picUrl": "https://rm.one-way.work/uploads/pics/00/83/749.webp"
+        },
+        {
+          "id": 7290,
+          "typeName": "another",
+          "name": "В цвете",
+          "picUrl": null
+        },
+        {
+          "id": 9602,
+          "typeName": "tag",
+          "name": "Семья",
+          "picUrl": null
+        },
+        {
+          "id": 9568,
+          "typeName": "tag",
+          "name": "Дворянство",
+          "picUrl": null
+        },
+        {
+          "id": 2160,
+          "typeName": "another",
+          "name": "Веб",
+          "picUrl": null
+        },
+        {
+          "id": 9511,
+          "typeName": "tag",
+          "name": "Месть",
+          "picUrl": null
+        },
+        {
+          "id": 9565,
+          "typeName": "tag",
+          "name": "Семейные ценности",
+          "picUrl": null
+        }
+      ],
+      "lastUpdate": "2026-10-22T23:26:13Z",
+      "productionStatus": "PROGRESS",
+      "translationStatus": "PROGRESS",
+      "forSale": false,
+      "saleStatus": "NONE",
+      "volumeCount": 1,
+      "chaptersCount": 110,
+      "rating": {
+        "voteCount": 124,
+        "rate": 9.46774
+      }
+    },
+    {
+      "elementId": {
+        "linkName": "34551",
+        "type": "MANGA",
+        "externalId": 34551,
+        "siteId": 12,
+        "fuid": "1:M:34551"
+      },
+      "category": {
+        "id": 3001,
+        "typeName": "category",
+        "name": "Манхва",
+        "picUrl": null
+      },
+      "name": "Оказалось, я наследник империи",
+      "picUrl": "https://rm.one-way.work/uploads/pics/02/69/135.webp",
+      "elements": [
+        {
+          "id": 9482,
+          "typeName": "tag",
+          "name": "ГГ мужчина",
+          "picUrl": null
+        },
+        {
+          "id": 2131,
+          "typeName": "genre",
+          "name": "фэнтези",
+          "picUrl": null
+        },
+        {
+          "id": 2130,
+          "typeName": "genre",
+          "name": "приключения",
+          "picUrl": null
+        },
+        {
+          "id": 8046,
+          "typeName": "publisher",
+          "name": "Naver",
+          "picUrl": "https://rm.one-way.work/uploads/pics/00/83/749.webp"
+        },
+        {
+          "id": 9527,
+          "typeName": "tag",
+          "name": "Политика",
+          "picUrl": null
+        },
+        {
+          "id": 7290,
+          "typeName": "another",
+          "name": "В цвете",
+          "picUrl": null
+        },
+        {
+          "id": 9499,
+          "typeName": "tag",
+          "name": "Империи",
+          "picUrl": null
+        },
+        {
+          "id": 2144,
+          "typeName": "genre",
+          "name": "психология",
+          "picUrl": null
+        },
+        {
+          "id": 9951,
+          "typeName": "year",
+          "name": "2026",
+          "picUrl": null
+        },
+        {
+          "id": 2160,
+          "typeName": "another",
+          "name": "Веб",
+          "picUrl": null
+        },
+        {
+          "id": 9511,
+          "typeName": "tag",
+          "name": "Месть",
+          "picUrl": null
+        },
+        {
+          "id": 9466,
+          "typeName": "tag",
+          "name": "Борьба за власть",
+          "picUrl": null
+        },
+        {
+          "id": 6181,
+          "typeName": "limitation",
+          "name": "PG-13",
+          "picUrl": null
+        }
+      ],
+      "lastUpdate": "2026-10-22T23:22:55Z",
+      "productionStatus": "PROGRESS",
+      "translationStatus": "PROGRESS",
+      "forSale": false,
+      "saleStatus": "NONE",
+      "volumeCount": 1,
+      "chaptersCount": 22,
+      "rating": {
+        "voteCount": 22,
+        "rate": 9.40909
+      }
+    },
+    {
+      "elementId": {
+        "linkName": "34864",
+        "type": "MANGA",
+        "externalId": 34864,
+        "siteId": 12,
+        "fuid": "1:M:34864"
+      },
+      "category": {
+        "id": 9451,
+        "typeName": "category",
+        "name": "Манга",
+        "picUrl": null
+      },
+      "name": "Изгнанный носильщик стал сильнейшим благодаря скрытому навыку хранения",
+      "picUrl": "https://rm.one-way.work/uploads/pics/02/80/314.webp",
+      "elements": [
+        {
+          "id": 9482,
+          "typeName": "tag",
+          "name": "ГГ мужчина",
+          "picUrl": null
+        },
+        {
+          "id": 2131,
+          "typeName": "genre",
+          "name": "фэнтези",
+          "picUrl": null
+        },
+        {
+          "id": 9515,
+          "typeName": "tag",
+          "name": "Навыки",
+          "picUrl": null
+        },
+        {
+          "id": 2130,
+          "typeName": "genre",
+          "name": "приключения",
+          "picUrl": null
+        },
+        {
+          "id": 2155,
+          "typeName": "genre",
+          "name": "боевик",
+          "picUrl": null
+        },
+        {
+          "id": 9951,
+          "typeName": "year",
+          "name": "2026",
+          "picUrl": null
+        },
+        {
+          "id": 2134,
+          "typeName": "genre",
+          "name": "сёнэн",
+          "picUrl": null
+        },
+        {
+          "id": 2160,
+          "typeName": "another",
+          "name": "Веб",
+          "picUrl": null
+        },
+        {
+          "id": 9450,
+          "typeName": "genre",
+          "name": "исэкай",
+          "picUrl": null
+        },
+        {
+          "id": 6181,
+          "typeName": "limitation",
+          "name": "PG-13",
+          "picUrl": null
+        },
+        {
+          "id": 9513,
+          "typeName": "tag",
+          "name": "Монстры",
+          "picUrl": null
+        }
+      ],
+      "lastUpdate": "2026-10-22T23:15:01Z",
+      "productionStatus": "PROGRESS",
+      "translationStatus": "PROGRESS",
+      "forSale": false,
+      "saleStatus": "NONE",
+      "volumeCount": 1,
+      "chaptersCount": 16,
+      "rating": {
+        "voteCount": 3,
+        "rate": 9.0
+      }
+    },
+    {
+      "elementId": {
+        "linkName": "34863",
+        "type": "MANGA",
+        "externalId": 34863,
+        "siteId": 12,
+        "fuid": "1:M:34863"
+      },
+      "category": {
+        "id": 3001,
+        "typeName": "category",
+        "name": "Манхва",
+        "picUrl": null
+      },
+      "name": "Демоны Чосона",
+      "picUrl": "https://rm.one-way.work/uploads/pics/02/80/313.webp",
+      "elements": [
+        {
+          "id": 2119,
+          "typeName": "genre",
+          "name": "история",
+          "picUrl": null
+        },
+        {
+          "id": 9482,
+          "typeName": "tag",
+          "name": "ГГ мужчина",
+          "picUrl": null
+        },
+        {
+          "id": 2143,
+          "typeName": "genre",
+          "name": "боевые искусства",
+          "picUrl": null
+        },
+        {
+          "id": 2130,
+          "typeName": "genre",
+          "name": "приключения",
+          "picUrl": null
+        },
+        {
+          "id": 9464,
+          "typeName": "tag",
+          "name": "Боги",
+          "picUrl": null
+        },
+        {
+          "id": 2159,
+          "typeName": "genre",
+          "name": "сверхъестественное",
+          "picUrl": null
+        },
+        {
+          "id": 8046,
+          "typeName": "publisher",
+          "name": "Naver",
+          "picUrl": "https://rm.one-way.work/uploads/pics/00/83/749.webp"
+        },
+        {
+          "id": 9465,
+          "typeName": "tag",
+          "name": "Бои на мечах",
+          "picUrl": null
+        },
+        {
+          "id": 7290,
+          "typeName": "another",
+          "name": "В цвете",
+          "picUrl": null
+        },
+        {
+          "id": 2155,
+          "typeName": "genre",
+          "name": "боевик",
+          "picUrl": null
+        },
+        {
+          "id": 9951,
+          "typeName": "year",
+          "name": "2026",
+          "picUrl": null
+        },
+        {
+          "id": 9532,
+          "typeName": "tag",
+          "name": "Разумные расы",
+          "picUrl": null
+        },
+        {
+          "id": 2160,
+          "typeName": "another",
+          "name": "Веб",
+          "picUrl": null
+        },
+        {
+          "id": 2118,
+          "typeName": "genre",
+          "name": "драма",
+          "picUrl": null
+        },
+        {
+          "id": 6181,
+          "typeName": "limitation",
+          "name": "PG-13",
+          "picUrl": null
+        },
+        {
+          "id": 9550,
+          "typeName": "tag",
+          "name": "Холодное оружие",
+          "picUrl": null
+        }
+      ],
+      "lastUpdate": "2026-10-22T23:12:59Z",
+      "productionStatus": "PROGRESS",
+      "translationStatus": "PROGRESS",
+      "forSale": false,
+      "saleStatus": "NONE",
+      "volumeCount": 1,
+      "chaptersCount": 8,
+      "rating": {
+        "voteCount": 1,
+        "rate": 9.0
+      }
+    },
+    {
+      "elementId": {
+        "linkName": "34862",
+        "type": "MANGA",
+        "externalId": 34862,
+        "siteId": 12,
+        "fuid": "1:M:34862"
+      },
+      "category": {
+        "id": 9451,
+        "typeName": "category",
+        "name": "Манга",
+        "picUrl": null
+      },
+      "name": "Даже второгодки хотят наслаждаться юностью!",
+      "picUrl": "https://rm.one-way.work/uploads/pics/02/80/312.webp",
+      "elements": [
+        {
+          "id": 2148,
+          "typeName": "tag",
+          "name": "Вампиры",
+          "picUrl": null
+        },
+        {
+          "id": 9482,
+          "typeName": "tag",
+          "name": "ГГ мужчина",
+          "picUrl": null
+        },
+        {
+          "id": 9480,
+          "typeName": "tag",
+          "name": "ГГ женщина",
+          "picUrl": null
+        },
+        {
+          "id": 2135,
+          "typeName": "genre",
+          "name": "повседневность",
+          "picUrl": null
+        },
+        {
+          "id": 2136,
+          "typeName": "genre",
+          "name": "комедия",
+          "picUrl": null
+        },
+        {
+          "id": 9826,
+          "typeName": "tag",
+          "name": "Современный мир",
+          "picUrl": null
+        },
+        {
+          "id": 9951,
+          "typeName": "year",
+          "name": "2026",
+          "picUrl": null
+        },
+        {
+          "id": 2121,
+          "typeName": "genre",
+          "name": "романтика",
+          "picUrl": null
+        },
+        {
+          "id": 6181,
+          "typeName": "limitation",
+          "name": "PG-13",
+          "picUrl": null
+        },
+        {
+          "id": 9554,
+          "typeName": "tag",
+          "name": "Япония",
+          "picUrl": null
+        },
+        {
+          "id": 2127,
+          "typeName": "genre",
+          "name": "школа",
+          "picUrl": null
+        }
+      ],
+      "lastUpdate": "2026-10-22T22:57:58Z",
+      "productionStatus": "PROGRESS",
+      "translationStatus": "PROGRESS",
+      "forSale": false,
+      "saleStatus": "NONE",
+      "volumeCount": 1,
+      "chaptersCount": 11,
+      "rating": {
+        "voteCount": 0,
+        "rate": 0.0
+      }
+    }
+  ]
+}

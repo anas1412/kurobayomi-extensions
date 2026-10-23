@@ -1,8 +1,0 @@
-id = "mangadex"
-name = "MangaDex"
-lang = "en"
-kind = "manga"
-version = 1
-# The only host the plug-in reaches through the `http` import: the API, which also names the image server of a chapter.
-# Covers and page images load in the app, not here.
-hosts = ["api.mangadex.org"]

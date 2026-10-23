@@ -1,3 +1,0 @@
-# What tools/check-health.py fetches to see that the site is up: the API the plug-in reads, not the web page.
-url = "https://api.inuko.me/v2/books?serviceName=inkstory&page=0&size=1"
-expect = "\"slug\""

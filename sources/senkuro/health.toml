@@ -1,4 +1,0 @@
-# What tools/check-health.py fetches to see that the site is up. The public mirror: senkuro.me is geo-blocked outside
-# Russia, so a runner abroad could not check it.
-url = "https://senkuro.com/"
-expect = "Senkuro"

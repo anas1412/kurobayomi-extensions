@@ -1,3 +1,0 @@
-# What tools/check-health.py fetches to see that the site is up.
-url = "https://kagane.si/"
-expect = "Kagane"

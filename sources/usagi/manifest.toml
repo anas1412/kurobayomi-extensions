@@ -1,7 +1,0 @@
-id = "usagi"
-name = "Usagi"
-lang = "ru"
-kind = "manga"
-version = 1
-# The only host the plug-in may reach through the `http` import. Covers and page images (rm.one-way.work) load in the app.
-hosts = ["web.usagi.one"]

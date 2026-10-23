@@ -1,4 +1,0 @@
-# What tools/check-health.py fetches to see that the site is up.
-url = "https://web.usagi.one/"
-expect = "Usagi"
-user_agent = "arora"  # the site answers 404 to a browser User-Agent here, as the plug-in sends this one

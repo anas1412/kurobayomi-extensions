@@ -1,9 +1,0 @@
-# The source's identity and the hosts its plug-in may reach through the host's http import.
-id = "animepahe"
-name = "AnimePahe"
-lang = "en"
-kind = "anime"
-version = 3
-# animepahe.pw is the site and its API (behind Cloudflare's browser check: the app reaches it through a hidden page);
-# kwik.cx is the player page of each video.
-hosts = ["animepahe.pw", "kwik.cx"]

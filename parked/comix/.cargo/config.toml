@@ -1,6 +1,0 @@
-# The plug-in is a component that imports only the host's `kuro:source/host`. `--wasi-adapter=none` keeps WASI out of it:
-# the app's linker does not provide WASI, so a wasm32-wasip2 build (which imports wasi:cli, wasi:clocks, wasi:random) would
-# fail to instantiate. Host builds (`cargo test`) are not affected.
-[target.wasm32-unknown-unknown]
-linker = "wasm-component-ld"
-rustflags = ["-C", "link-arg=--wasi-adapter=none"]

@@ -1,7 +1,0 @@
-id = "mangapill"
-name = "MangaPill"
-lang = "en"
-kind = "manga"
-version = 1
-# The only host the plug-in may reach through the `http` import. Covers and page images (a CDN host) load in the app.
-hosts = ["mangapill.com"]

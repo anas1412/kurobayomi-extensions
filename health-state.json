@@ -11,6 +11,10 @@
   "fails": 0,
   "status": "active"
  },
+ "inkstory": {
+  "fails": 0,
+  "status": "active"
+ },
  "kagane": {
   "fails": 0,
   "status": "active"
@@ -28,6 +32,14 @@
   "status": "active"
  },
  "mangapill": {
+  "fails": 0,
+  "status": "active"
+ },
+ "senkuro": {
+  "fails": 0,
+  "status": "active"
+ },
+ "usagi": {
   "fails": 0,
   "status": "active"
  },

@@ -1,0 +1,8 @@
+id = "senkuro"
+name = "Senkuro"
+lang = "ru"
+kind = "manga"
+version = 1
+# The only hosts the plug-in reaches through the `http` import: the GraphQL API of the public mirror and of the one for
+# Russia. Covers and page images (on mirai.senkuro.net) load in the app, not here.
+hosts = ["api.senkuro.com", "api.senkuro.me"]

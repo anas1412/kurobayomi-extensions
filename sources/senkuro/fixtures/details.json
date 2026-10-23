@@ -1,0 +1,292 @@
+{
+ "data": {
+  "mangaTachiyomiInfo": {
+   "id": "TUFOR0E6MjUzNTkzNzY5MDI1MjI2MjQ5",
+   "slug": "iranai-skill-kaitorimasu",
+   "originalName": {
+    "lang": "JA",
+    "content": "Iranai Skill Kaitorimasu"
+   },
+   "titles": [
+    {
+     "lang": "EN",
+     "content": "I Buy Unneeded Skills"
+    },
+    {
+     "lang": "RU",
+     "content": "Скупщик ненужных навыков"
+    },
+    {
+     "lang": "JA",
+     "content": "いらないスキル買い取ります"
+    }
+   ],
+   "alternativeNames": [
+    {
+     "lang": "EN",
+     "content": "いらないスキル買い取ります"
+    },
+    {
+     "lang": "EN",
+     "content": "Let Me Buy Your Skill Not to Need"
+    },
+    {
+     "lang": "EN",
+     "content": "I Buy Unneeded Skills"
+    },
+    {
+     "lang": "RU",
+     "content": "Покупка ненужных навыков"
+    }
+   ],
+   "localizations": [
+    {
+     "lang": "RU",
+     "description": "В этом мире каждый человек с рождения получает от богов особый дар — навык.Одни способности делают жизнь проще и открывают путь к богатству и славе. Другие становятся настоящим проклятием: слабое здоровье, хроническое невезение, отсутствие вкуса или способность притягивать к себе монстров.Но даже от такого дара можно избавиться.По миру странствует загадочный молодой торговец, известный как Скупщик ненужных навыков. Благодаря редкой способности «Купля-продажа» он может выкупать навыки у их владельцев, а затем передавать их тем, кому они действительно пригодятся.К нему приходят авантюристы и дворяне, ученики и мудрецы, эльфы и даже разумные монстры. У каждого свой навык, своя проблема и своя причина от него отказаться.Однако то, что одному кажется проклятием, для другого может стать бесценным даром.Это история о необычном торговце и людях, чьи судьбы меняются благодаря одной единственной сделке. © Senkuro"
+    }
+   ],
+   "type": "MANGA",
+   "rating": "QUESTIONABLE",
+   "status": "ONGOING",
+   "formats": [
+    "WEB"
+   ],
+   "labels": [
+    {
+     "id": "TEFCRUw6NzIx",
+     "rootId": "TEFCRUw6NQ",
+     "slug": "magic",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Магия"
+      },
+      {
+       "lang": "EN",
+       "content": "Magic"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6NjI1",
+     "rootId": "TEFCRUw6NA",
+     "slug": "middle_ages",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Средневековье"
+      },
+      {
+       "lang": "EN",
+       "content": "Middle Ages"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6NTg0",
+     "rootId": "TEFCRUw6Mw",
+     "slug": "monster",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Монстр"
+      },
+      {
+       "lang": "EN",
+       "content": "Monster"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6Nzg2",
+     "rootId": "TEFCRUw6NQ",
+     "slug": "artifacts",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Артефакты"
+      },
+      {
+       "lang": "EN",
+       "content": "Artifacts"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6NTky",
+     "rootId": "TEFCRUw6Mw",
+     "slug": "magical_creatures",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Волшебные существа"
+      },
+      {
+       "lang": "EN",
+       "content": "Magical Creatures"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6NzI4",
+     "rootId": "TEFCRUw6NQ",
+     "slug": "guilds",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Гильдии"
+      },
+      {
+       "lang": "EN",
+       "content": "Guilds"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6OA",
+     "rootId": "TEFCRUw6MQ",
+     "slug": "male_protagonist",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "ГГ мужчина"
+      },
+      {
+       "lang": "EN",
+       "content": "Male Protagonist"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6NTk4",
+     "rootId": "TEFCRUw6Mw",
+     "slug": "aristocracy",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Аристократия"
+      },
+      {
+       "lang": "EN",
+       "content": "Aristocracy"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6ODU4",
+     "rootId": "TEFCRUw6NQ",
+     "slug": "drama",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Драма"
+      },
+      {
+       "lang": "EN",
+       "content": "Drama"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6OTU2",
+     "rootId": "TEFCRUw6NQ",
+     "slug": "adventure",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Приключения"
+      },
+      {
+       "lang": "EN",
+       "content": "Adventure"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6NjI2",
+     "rootId": "TEFCRUw6NA",
+     "slug": "fantasy_world",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Фэнтезийный мир"
+      },
+      {
+       "lang": "EN",
+       "content": "Fantasy World"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6NzY3",
+     "rootId": "TEFCRUw6NQ",
+     "slug": "fantasy",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Фэнтези"
+      },
+      {
+       "lang": "EN",
+       "content": "Fantasy"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6MTExNA",
+     "rootId": "TEFCRUw6Nw",
+     "slug": "shounen",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Сёнен"
+      },
+      {
+       "lang": "EN",
+       "content": "shounen"
+      }
+     ]
+    },
+    {
+     "id": "TEFCRUw6NzIw",
+     "rootId": "TEFCRUw6NQ",
+     "slug": "skills",
+     "titles": [
+      {
+       "lang": "RU",
+       "content": "Навыки / Способности"
+      },
+      {
+       "lang": "EN",
+       "content": "Skills"
+      }
+     ]
+    }
+   ],
+   "translationStatus": "IN_PROGRESS",
+   "cover": {
+    "original": {
+     "url": "https://mirai.senkuro.net/manga/253593769025226249/covers/99dfc9b6b2eff7cb7242b62aff982f798dd2a523_253593941461452332.jpeg"
+    }
+   },
+   "mainStaff": [
+    {
+     "roles": [
+      "STORY"
+     ],
+     "person": {
+      "name": "Hiru Kuma"
+     }
+    },
+    {
+     "roles": [
+      "ART"
+     ],
+     "person": {
+      "name": "Keyaki Kobayashi"
+     }
+    }
+   ]
+  }
+ }
+}

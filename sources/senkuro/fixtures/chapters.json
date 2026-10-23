@@ -1,0 +1,91 @@
+{
+ "data": {
+  "mangaTachiyomiChapters": {
+   "message": null,
+   "chapters": [
+    {
+     "id": "TUFOR0FfQ0hBUFRFUjoyNTM1OTQxMDA0NTkxMjgzMjY",
+     "slug": "253594100459128326",
+     "branchId": "TUFOR0FfQlJBTkNIOjI1MzU5Mzc2OTAyNTI5MTc4NQ",
+     "name": null,
+     "teamIds": [
+      "VEVBTTo2MjAyNzY4NDYzNjU0OTU2Mw",
+      "VEVBTToyNTAzMDQ0ODAwOTkxOTAzMjk"
+     ],
+     "number": "17.2",
+     "volume": "1",
+     "createdAt": "2026-10-16T11:11:02.755203",
+     "updatedAt": "2026-10-16T11:11:02.755203"
+    },
+    {
+     "id": "TUFOR0FfQ0hBUFRFUjoyNTM1OTM5OTEwNzE2ODAwMDY",
+     "slug": "253593991071680006",
+     "branchId": "TUFOR0FfQlJBTkNIOjI1MzU5Mzc2OTAyNTI5MTc4NQ",
+     "name": null,
+     "teamIds": [
+      "VEVBTTo2MjAyNzY4NDYzNjU0OTU2Mw",
+      "VEVBTToyNTAzMDQ0ODAwOTkxOTAzMjk"
+     ],
+     "number": "17.1",
+     "volume": "1",
+     "createdAt": "2026-10-16T11:09:57.557985",
+     "updatedAt": "2026-10-16T11:09:57.557985"
+    },
+    {
+     "id": "TUFOR0FfQ0hBUFRFUjoyNTM1OTM5MTc2MjEwMjgzNTg",
+     "slug": "253593917621028358",
+     "branchId": "TUFOR0FfQlJBTkNIOjI1MzU5Mzc2OTAyNTI5MTc4NQ",
+     "name": null,
+     "teamIds": [
+      "VEVBTTo2MjAyNzY4NDYzNjU0OTU2Mw",
+      "VEVBTToyNTAzMDQ0ODAwOTkxOTAzMjk"
+     ],
+     "number": "16.3",
+     "volume": "1",
+     "createdAt": "2026-10-16T11:09:13.770640",
+     "updatedAt": "2026-10-16T11:09:13.770640"
+    },
+    {
+     "id": "TUFOR0FfQ0hBUFRFUjoyNTM1OTM5MzI0Njg4NjQ1MTg",
+     "slug": "253593932468864518",
+     "branchId": "TUFOR0FfQlJBTkNIOjI1MzU5Mzc2OTAyNTI5MTc4NQ",
+     "name": null,
+     "teamIds": [
+      "VEVBTTo2MjAyNzY4NDYzNjU0OTU2Mw",
+      "VEVBTToyNTAzMDQ0ODAwOTkxOTAzMjk"
+     ],
+     "number": "16.2",
+     "volume": "1",
+     "createdAt": "2026-10-16T11:09:22.626116",
+     "updatedAt": "2026-10-16T11:09:22.626116"
+    },
+    {
+     "id": "TUFOR0FfQ0hBUFRFUjoyNTM1OTQxMTM0OTUwMjUxNTg",
+     "slug": "253594113495025158",
+     "branchId": "TUFOR0FfQlJBTkNIOjI1MzU5Mzc2OTAyNTI5MTc4NQ",
+     "name": null,
+     "teamIds": [
+      "VEVBTTo2MjAyNzY4NDYzNjU0OTU2Mw",
+      "VEVBTToyNTAzMDQ0ODAwOTkxOTAzMjk"
+     ],
+     "number": "16.1",
+     "volume": "1",
+     "createdAt": "2026-10-16T11:11:10.529487",
+     "updatedAt": "2026-10-16T11:11:10.529487"
+    }
+   ],
+   "teams": [
+    {
+     "id": "VEVBTTo2MjAyNzY4NDYzNjU0OTU2Mw",
+     "slug": "cv_four",
+     "name": "CVmanga"
+    },
+    {
+     "id": "VEVBTToyNTAzMDQ0ODAwOTkxOTAzMjk",
+     "slug": "@250304480099190329",
+     "name": "Типочек"
+    }
+   ]
+  }
+ }
+}
